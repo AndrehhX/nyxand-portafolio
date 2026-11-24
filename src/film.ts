@@ -153,7 +153,13 @@ export function initCase(lenis: Lenis | null) {
     const t = e.target as Element
     const btn = t.closest<HTMLElement>('[data-open]')
     if (btn) return open(Number(btn.dataset.open))
-    if (t.closest('[data-close]')) close()
+    if (t.closest('.case__close')) close()
   })
-  addEventListener('keydown', (e) => e.key === 'Escape' && close())
+  q<HTMLElement>('.case__backdrop').addEventListener('click', close)
+  addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && root.classList.contains('is-open')) {
+      e.preventDefault()
+      close()
+    }
+  })
 }

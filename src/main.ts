@@ -65,7 +65,11 @@ function initHudTheme() {
     // en un corte cuenta su color de arriba o de abajo según dónde cae el menú
     const tear = under?.closest<HTMLElement>('.tear')
     let want: boolean
-    if (tear) {
+    if (under?.closest('#hablemos')) {
+      // HABLEMOS es oscura: el HUD necesita tinta clara aunque el punto
+      // consultado caiga sobre un hijo sin fondo propio.
+      want = false
+    } else if (tear) {
       const r = tear.getBoundingClientRect()
       want = (30 - r.top < r.height * 0.5 ? tear.dataset.from : tear.dataset.to) === 'paper'
     } else want = !!under?.closest('.paper')
@@ -304,7 +308,7 @@ function animate() {
 
   // Etiquetas técnicas: se decodifican al entrar
   gsap.utils.toArray<HTMLElement>('.label, .trabajo__hint, .photos__hint, .facts__l, .hablemos__quote').forEach((el) => {
-    ScrollTrigger.create({ trigger: el, start: 'top 92%', once: true, onEnter: () => scrambleIn(el, 900) })
+    ScrollTrigger.create({ trigger: el, start: 'top 92%', once: true, onEnter: () => scrambleIn(el, 520) })
   })
 
   // Párrafos: palabra por palabra desde abajo, el resaltado lima se barre
