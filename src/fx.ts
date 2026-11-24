@@ -207,6 +207,11 @@ export function initSpray() {
   let moves = 0
   let blocked: boolean | null = null
   let dirty = false
+  // caja que ocupó la pintura en el último frame (para borrar sólo eso)
+  let bx0 = 0
+  let by0 = 0
+  let bx1 = innerWidth
+  let by1 = innerHeight
   const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5
 
   addEventListener('pointermove', (e) => {
@@ -262,7 +267,11 @@ export function initSpray() {
     }
     if (!dirty) c.style.display = ''
     dirty = true
-    o.clearRect(0, 0, c.width, c.height)
+    // borrar sólo el rectángulo donde había pintura el frame anterior, no
+    // toda la pantalla (la pintura suele ocupar un área chica cerca del cursor)
+    o.clearRect(bx0 - 4, by0 - 4, bx1 - bx0 + 8, by1 - by0 + 8)
+    bx0 = by0 = Infinity
+    bx1 = by1 = -Infinity
     for (let i = ps.length - 1; i >= 0; i--) {
       const p = ps[i]
       p.life++
@@ -280,9 +289,14 @@ export function initSpray() {
         o.beginPath()
         o.arc(p.x, p.y, p.r * 0.9, 0, Math.PI * 2)
         o.fill()
+        if (p.y0 < by0) by0 = p.y0
       } else {
         o.fillRect(p.x, p.y, p.r, p.r)
+        if (p.y < by0) by0 = p.y
       }
+      if (p.x - p.r < bx0) bx0 = p.x - p.r
+      if (p.x + p.r > bx1) bx1 = p.x + p.r
+      if (p.y + p.r > by1) by1 = p.y + p.r
     }
     o.globalAlpha = 1
   })
@@ -334,6 +348,21 @@ export function initMeltables() {
   const NS = 'http://www.w3.org/2000/svg'
   const noise = columnNoise()
   const items = [...document.querySelectorAll<HTMLElement>('.melt')].map((el, i) => {
+    // títulos gigantes que sólo se derriten con el cursor: ruido continuo
+    // (feTurbulence). El feImage se desalinea entre los mosaicos en que el
+    // navegador pinta un elemento tan grande y lo corta en franjas.
+    if (el.dataset.meltScroll === 'off') {
+      const f = (document.getElementById('melt') as unknown as SVGFilterElement).cloneNode(true) as SVGFilterElement
+      f.id = `melt-${i}`
+      defs.appendChild(f)
+      el.style.filter = `url(#melt-${i})`
+      const map = f.querySelector('feDisplacementMap')!
+      map.removeAttribute('id')
+      const it = { el, map, hover: 0, target: 0, shown: -1, scroll: false }
+      el.addEventListener('pointerenter', () => (it.target = 70))
+      el.addEventListener('pointerleave', () => (it.target = 0))
+      return it
+    }
     const f = document.createElementNS(NS, 'filter')
     f.id = `melt-${i}`
     f.setAttribute('x', '-2%')

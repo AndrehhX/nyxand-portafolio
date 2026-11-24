@@ -452,23 +452,26 @@ function extrude() {
     m.tx = e.clientX / innerWidth - 0.5
     m.ty = e.clientY / innerHeight - 0.5
   })
+  // La extrusión (18 sombras sobre un texto gigante con filtro) se pinta UNA
+  // vez. Antes se recalculaba en cada movimiento del mouse: repintaba el
+  // título entero y le volvía a aplicar el derretido → los bajones de esta
+  // sección. Ahora el efecto 3D lo da sólo la rotación del bloque, que la
+  // hace la GPU sin repintar nada.
+  const depth = 18
+  const layers: string[] = []
+  for (let i = 1; i <= depth; i++) {
+    const c = i === depth ? 'var(--lime)' : i % 2 ? '#1d1d1b' : '#2a2a28'
+    layers.push(`${(0.55 * i).toFixed(1)}px ${(1.15 * i).toFixed(1)}px 0 ${c}`)
+  }
+  el.style.setProperty('--ts', layers.join(','))
+
   let on = false
   new IntersectionObserver(([en]) => (on = en.isIntersecting)).observe(el)
   const draw = () => {
-    // fuera de pantalla o ya asentado: no repintar
-    if (!on || (Math.abs(m.tx - m.x) < 0.001 && Math.abs(m.ty - m.y) < 0.001 && el.style.getPropertyValue('--ts'))) return
+    if (!on || (Math.abs(m.tx - m.x) < 0.0005 && Math.abs(m.ty - m.y) < 0.0005)) return
     m.x += (m.tx - m.x) * 0.08
     m.y += (m.ty - m.y) * 0.08
-    const depth = 18
-    const dx = -m.x * 2.6 + 0.25
-    const dy = -m.y * 2.6 + 0.5
-    const layers: string[] = []
-    for (let i = 1; i <= depth; i++) {
-      const c = i === depth ? 'var(--lime)' : i % 2 ? '#1d1d1b' : '#2a2a28'
-      layers.push(`${(dx * i).toFixed(1)}px ${(dy * i + i * 0.6).toFixed(1)}px 0 ${c}`)
-    }
-    el.style.setProperty('--ts', layers.join(','))
-    stage.style.transform = `rotateY(${m.x * 16}deg) rotateX(${-m.y * 12}deg)`
+    stage.style.transform = `rotateY(${(m.x * 22).toFixed(2)}deg) rotateX(${(-m.y * 16).toFixed(2)}deg)`
   }
   gsap.ticker.add(draw)
 }

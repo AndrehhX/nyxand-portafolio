@@ -152,7 +152,8 @@ export function initDrips(getVelocity: () => number, reduce: boolean) {
         p.el.setAttribute('cy', p.y.toFixed(1))
         p.el.setAttribute('rx', (p.r / Math.sqrt(st)).toFixed(2))
         p.el.setAttribute('ry', (p.r * st).toFixed(2))
-        if (p.y > H + 320) {
+        // que no caigan tan lejos: el área del filtro goo crece con la gota
+        if (p.y > H + 140) {
           p.el.remove()
           drops.splice(i, 1)
         }
@@ -170,10 +171,10 @@ export function initDrips(getVelocity: () => number, reduce: boolean) {
       requestAnimationFrame(once)
       return
     }
-    // 30 fps: la pintura baja lento y cada actualización re-filtra el SVG (goo)
+    // 24 fps: la pintura baja lento y cada actualización re-filtra el SVG (goo)
     let lastT = 0
     gsap.ticker.add((t) => {
-      if (t - lastT < 1 / 31) return
+      if (t - lastT < 1 / 25) return
       lastT = t
       tick()
     })
