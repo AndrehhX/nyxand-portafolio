@@ -5,6 +5,9 @@ const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5]
 const INK = [11, 11, 10]
 const PAPER = [231, 228, 220]
 
+// El gótico en mayúsculas no se lee: "MONO MOTION" → "Mono Motion"
+const titleCase = (s: string) => s.toLowerCase().replace(/(^|\s)\S/g, (c) => c.toUpperCase())
+
 function rng(seed: number) {
   let s = seed * 9301 + 49297
   return () => ((s = (s * 9301 + 49297) % 233280) / 233280)
@@ -75,7 +78,7 @@ export function buildFilm() {
         <span class="frame__status">${p.status.toUpperCase()}</span>
       </button>
       <div class="frame__meta">
-        <h3>${p.name}</h3>
+        <h3 class="chrome">${titleCase(p.name)}</h3>
         <p>${p.kind}. ${p.desc}</p>
         <span>${p.stack.join(' · ')}</span>
       </div>
@@ -88,7 +91,7 @@ export function buildFilm() {
     `<article class="frame frame--end">
       <div class="frame__edge"><span>NYX 100 PROFESSIONAL</span><span>▸ 06A</span></div>
       <a class="frame__shot frame__shot--end" href="#hablemos" data-cursor="hablemos">
-        <span>¿FOTOGRAMA 06?</span>
+        <span>¿fotograma 06?</span>
         <em>puede ser el tuyo →</em>
       </a>
       <div class="frame__meta"><h3>TU PROYECTO</h3><p>Todavía sin revelar.</p></div>
@@ -109,7 +112,7 @@ export function initCase(lenis: Lenis | null) {
     const p = projects[i]
     q<HTMLElement>('.case__count').textContent = `[ CASO ${p.id} / ${String(projects.length).padStart(2, '0')} ]`
     q<HTMLElement>('.case__num').textContent = p.id
-    q<HTMLElement>('.case__title').textContent = p.name
+    q<HTMLElement>('.case__title').textContent = titleCase(p.name)
     q<HTMLElement>('.case__lead').textContent = p.long
     q<HTMLElement>('.case__status').textContent = p.status
     q<HTMLElement>('.case__kind').textContent = p.kind

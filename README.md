@@ -6,8 +6,10 @@ La dirección visual mezcla lo hecho a mano (tinta, brocha, papel rasgado, garab
 ## Características
 
 - **Hero WebGL**: "NyxAnd" en blackletter 3D extruido de cromo, con piercings, pasado por un shader de dithering 1-bit. El cursor abre una lente que revela el cromo real, mantener presionado derrite las letras y el scroll las desintegra en píxeles.
-- **Intro**: contador en pixel-gótico mientras carga el 3D; luego las letras caen con impacto (temblor de cámara y flash) y entra la losa con el nombre.
-- **Foto real tramada** a 1-bit como fondo del hero, y tira "Fuera del código" con fotos estilo fotocopia, arrastre con inercia e inclinación 3D.
+- **Intro**: contador en pixel-gótico mientras carga el 3D; luego las letras caen con impacto (temblor de cámara y flash) y el nombre se pinta como tag de aerosol que chorrea.
+- **Tipografía urbana**: gótico de cromo (Grenze Gotisch) + graffiti (Sedgwick Ave Display). Los titulares se derriten con un filtro SVG cuya intensidad depende de la velocidad del scroll.
+- **Cortes multicapa**: entre secciones la página se rompe y deja ver capas de sticker roto lima y negro/blanco, con chorreados que se estiran con el scroll.
+- **Foto real tramada** a 1-bit como fondo del hero, y carrusel WebGL infinito "Fuera del código" que se arquea y se derrite según la velocidad del arrastre.
 - **Capturas reales** de Orunei y Kaze en el carrete (se revelan a color al pasar el cursor).
 - **Sigilos procedurales** (estilo cyber-sigilism) generados con curvas bezier y espinas.
 - **Animaciones 3D**: titulares que caen como placas, carrete de proyectos en cilindro 3D y "HABLEMOS" con extrusión que sigue al cursor.
@@ -51,7 +53,8 @@ El build es estático: se puede desplegar en Vercel, Netlify o cualquier hosting
     ├── main.ts         # Arranque, Lenis y animaciones de scroll
     ├── hero3d.ts       # Hero WebGL: texto 3D de cromo + shader de dithering
     ├── sigil.ts        # Generador procedural de sigilos
-    ├── interact.ts     # Carrusel de fotos con inercia
+    ├── photos3d.ts     # Carrusel WebGL de fotos que se derrite
+    ├── interact.ts     # Carrusel DOM de respaldo (sin WebGL)
     ├── film.ts         # Carrete de proyectos, pósters 1-bit y panel de caso
     ├── projects.ts     # Datos de los proyectos
     ├── fx.ts           # Rasgados, cintas, cursor, grano, reloj y utilidades

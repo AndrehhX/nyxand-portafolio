@@ -825,6 +825,155 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
   .hablemos__quote { text-align: left; margin-left: 0; }
 }
 
+/* ==============================================================
+   v4 — TIPOGRAFÍA URBANA: gótico de cromo + graffiti, todo derretible
+   ============================================================== */
+:root { --graf: 'Sedgwick Ave Display', 'Grenze Gotisch', cursive; }
+
+.h-goth {
+  font-family: var(--goth);
+  font-weight: 900;
+  text-transform: none;
+  letter-spacing: -0.025em;
+  line-height: 0.8;
+}
+.h-graf {
+  font-family: var(--graf);
+  font-weight: 400;
+  text-transform: none;
+  line-height: 0.8;
+  letter-spacing: -0.01em;
+}
+.h-graf--lime { color: var(--lime); text-shadow: 0.04em 0.05em 0 #000; }
+.h-graf--ink { color: var(--ink); text-shadow: 0.045em 0.05em 0 var(--lime); }
+.h-right { text-align: right; }
+
+/* cromo: bandas duras como el lettering de NyxAnd; el reflejo corre con el scroll */
+.chrome {
+  background-image: linear-gradient(180deg, #ffffff 0%, #f3f3ef 20%, #9a9a95 40%, #121211 47%, #2b2b29 52%, #d2d2cc 60%, #ffffff 70%, #b4b4ae 86%, #3c3c3a 100%);
+  background-size: 100% 240%;
+  background-position: 50% var(--shine, 0%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  padding-bottom: 0.14em;
+}
+.chrome--ink {
+  background-image: linear-gradient(180deg, #000 0%, #353533 24%, #000 45%, #7c7c77 51%, #161615 62%, #000 82%, #4a4a47 100%);
+}
+.melt { filter: url(#melt); }
+
+.hud__logo { font-family: var(--goth); font-weight: 900; font-size: 28px; letter-spacing: -0.02em; }
+
+/* ---- hero: nombre como tag de aerosol ---- */
+.tag {
+  position: absolute;
+  left: var(--gut);
+  bottom: clamp(64px, 11vh, 120px);
+  z-index: 3;
+  pointer-events: none;
+  rotate: -6deg;
+}
+.tag__name {
+  display: block;
+  font-family: var(--graf);
+  font-size: clamp(60px, 9.5vw, 170px);
+  line-height: 0.85;
+  color: var(--lime);
+  text-shadow: 0.05em 0.05em 0 #000, -0.01em -0.01em 0 #000;
+  filter: url(#melt-static);
+  white-space: nowrap;
+}
+.tag__meta {
+  display: block;
+  width: fit-content;
+  margin: 0.9em 0 0 0.6em;
+  padding: 4px 8px;
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ---- cortes multicapa ---- */
+.tear { height: clamp(120px, 16vw, 250px); margin: -2px 0; }
+.tear__l { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; transform-origin: 50% 0%; }
+.tear__l--back { filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.35)); }
+.tear__l--lime { filter: drop-shadow(0 5px 0 rgba(0, 0, 0, 0.35)); }
+.tear__l--front { filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.45)); }
+
+/* ---- YO ---- */
+.yo__title { display: flex; flex-direction: column; margin: 18px 0 clamp(50px, 7vw, 100px); }
+.yo__title .h-goth { font-size: clamp(66px, 14.2vw, 270px); }
+.yo__title .h-graf { position: relative; z-index: 2; font-size: clamp(46px, 8.4vw, 160px); margin: -0.32em 0 -0.18em 9%; rotate: -4deg; }
+
+/* ---- fotos ---- */
+.photos { overflow: visible; cursor: auto; margin-top: clamp(80px, 11vw, 160px); }
+.photos__head { align-items: end; border-bottom: 0; padding-bottom: 0; }
+.photos__head h3 { display: flex; flex-direction: column; font-family: inherit; }
+.photos__head .h-graf { font-size: clamp(40px, 6.5vw, 120px); rotate: -5deg; margin-left: 0.2em; position: relative; z-index: 2; margin-bottom: -0.25em; }
+.photos__head .h-goth { font-size: clamp(76px, 13vw, 240px); }
+.photos__cap { display: grid; grid-template-columns: auto auto; align-items: end; gap: 0 14px; text-align: right; }
+.photos__cap b { grid-row: span 2; font-family: var(--pixgoth); font-size: clamp(90px, 11vw, 180px); line-height: 0.7; color: var(--ink); text-shadow: 0.04em 0.04em 0 var(--lime); }
+.photos__cap span { font-family: var(--graf); font-size: clamp(30px, 3.4vw, 56px); line-height: 0.9; }
+.photos__cap em { font-style: normal; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; }
+.photos__stage {
+  position: relative;
+  height: clamp(460px, 74vh, 760px);
+  margin-top: 18px;
+  background: var(--ink);
+  overflow: hidden;
+}
+.photos__gl { position: absolute; inset: 0; width: 100%; height: 100%; display: block; cursor: grab; touch-action: pan-y; }
+.photos__gl.is-drag { cursor: grabbing; }
+.photos__hint { position: absolute; left: var(--gut); bottom: 14px; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--paper); opacity: 0.6; pointer-events: none; }
+.photos__track { display: none; }
+.photos--fallback .photos__track { display: flex; }
+.photos--fallback .photos__stage { display: none; }
+
+/* ---- TRABAJO ---- */
+.trabajo__head h2 { display: flex; flex-direction: column; margin-top: 10px; }
+.trabajo__head .h-goth { font-size: clamp(70px, 10vw, 180px); }
+.trabajo__head .h-graf { font-size: clamp(30px, 3.6vw, 66px); rotate: -3deg; margin: -0.2em 0 0 0.3em; position: relative; z-index: 2; }
+.frame__meta h3 { font-family: var(--goth); font-weight: 900; font-size: clamp(38px, 3.2vw, 54px); line-height: 0.85; letter-spacing: -0.02em; }
+.frame__shot--end span { font-family: var(--graf); font-size: clamp(40px, 3.6vw, 60px); color: var(--paper); }
+.case__title { font-family: var(--goth); font-weight: 900; letter-spacing: -0.02em; }
+
+/* ---- STACK ---- */
+.stack__title { display: flex; flex-direction: column; }
+.stack__title .h-goth { font-size: clamp(64px, 12.6vw, 240px); }
+.stack__title .h-graf { font-size: clamp(40px, 6.8vw, 130px); rotate: -3deg; margin-top: -0.2em; position: relative; z-index: 2; }
+.stack__note { position: static; display: block; width: fit-content; margin: 26px 0 0 auto; }
+
+/* ---- HABLEMOS ---- */
+.hablemos__crazy.h-graf { font-size: clamp(56px, 9vw, 170px); line-height: 0.8; margin-bottom: -0.4em; z-index: 3; }
+.hablemos__big { position: relative; isolation: isolate; color: var(--paper); line-height: 0.82; overflow: visible; }
+.hablemos__big::before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  color: #1d1d1b;
+  text-shadow: var(--ts, none);
+  padding: inherit;
+}
+.hablemos__mail { font-family: var(--mono); font-weight: 800; font-size: clamp(20px, 3.6vw, 58px); letter-spacing: -0.04em; }
+.marquee span { font-family: var(--graf); }
+.marquee em { font-style: normal; }
+
+@media (max-width: 760px) {
+  .tag { bottom: 74px; }
+  .tag__name { font-size: 12.5vw; }
+  .corner--br { display: none; }
+  .yo__title .h-graf { margin-left: 2%; }
+  .photos__head { flex-direction: column; align-items: start; }
+  .photos__cap { text-align: left; }
+  .photos__stage { height: 72svh; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
+  .melt { filter: none; }
 }

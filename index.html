@@ -9,13 +9,25 @@
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;700;800&family=Sedgwick+Ave+Display&display=swap" rel="stylesheet" />
   </head>
   <body>
     <svg class="defs" aria-hidden="true" width="0" height="0">
       <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
         <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="4" />
         <feDisplacementMap in="SourceGraphic" scale="8" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <!-- Derretido: desplaza columnas hacia abajo (sólo eje Y). La escala la
+           maneja JS según la velocidad del scroll. -->
+      <filter id="melt" x="-2%" y="-10%" width="104%" height="170%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.03 0.002" numOctaves="2" seed="7" result="n" />
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 -0.6 0 0 0.5  0 0 0 0 0.5  0 0 0 0 1" result="m" />
+        <feDisplacementMap id="melt-map" in="SourceGraphic" in2="m" scale="14" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
+      <filter id="melt-static" x="-2%" y="-10%" width="104%" height="170%" color-interpolation-filters="sRGB">
+        <feTurbulence type="fractalNoise" baseFrequency="0.045 0.003" numOctaves="2" seed="11" result="n" />
+        <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 -0.7 0 0 0.5  0 0 0 0 0.5  0 0 0 0 1" result="m" />
+        <feDisplacementMap id="melt-static-map" in="SourceGraphic" in2="m" scale="26" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </svg>
 
@@ -33,7 +45,7 @@
     <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
 
     <header class="hud">
-      <a href="#top" class="hud__logo" data-cursor="inicio">NYX<span>/</span>AND</a>
+      <a href="#top" class="hud__logo" data-cursor="inicio">Nyx<span>/</span>And</a>
       <nav class="hud__nav" aria-label="Principal">
         <a href="#yo" data-cursor="ir">[01] YO</a>
         <a href="#trabajo" data-cursor="ir">[02] TRABAJO</a>
@@ -52,14 +64,12 @@
 
         <div class="corner corner--tl">[ ANDREH CALLEJAS ]<br />CÓDIGO · INTERFACES · AUTOMATIZACIÓN</div>
         <div class="corner corner--tr">GUATEMALA<br />14.63°N 90.51°W</div>
-        <div class="corner corner--bl"><span class="blink">■</span> MANTÉN PRESIONADO<br />PARA DERRETIR</div>
-        <div class="corner corner--br">VOL. 02 — 2026<br />SIGUE BAJANDO ↓</div>
+        <div class="corner corner--br"><span class="blink">■</span> MANTÉN PRESIONADO<br />PARA DERRETIR</div>
         <div class="hero__status">● DISPONIBLE PARA PROYECTOS</div>
 
-        <div class="namebar" aria-hidden="true">
-          <span class="namebar__name">ANDREH CALLEJAS</span>
-          <span class="namebar__meta">DESARROLLADOR<br />DE SOFTWARE</span>
-          <span class="namebar__meta">[ 001 ]<br />GT — 2026</span>
+        <div class="tag" aria-hidden="true">
+          <span class="tag__name">Andreh Callejas</span>
+          <span class="tag__meta">[ desarrollador de software — guatemala ]</span>
         </div>
       </section>
 
@@ -69,10 +79,10 @@
       <section class="yo paper" id="yo">
         <svg class="sigil sigil--yo" data-sigil="7" data-strokes="5"></svg>
         <div class="label">[ 01 — SOBRE MÍ ]</div>
-        <h2 class="yo__title" data-reveal>
-          <span class="line">ESCRIBO CÓDIGO</span>
-          <span class="line"><span class="goth stamp">como quien</span> RAYA</span>
-          <span class="line">UN <span class="scribble">CUADERNO<svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"><path data-draw d="M18 46 C 12 14, 120 4, 186 22 C 214 32, 190 70, 110 74 C 40 78, 4 60, 10 38 C 16 20, 70 10, 130 12" /></svg></span>.</span>
+        <h2 class="yo__title" data-reveal aria-label="Escribo código como quien raya un cuaderno">
+          <span class="line h-goth chrome chrome--ink melt" aria-hidden="true">Escribo código</span>
+          <span class="line h-graf h-graf--ink" aria-hidden="true">como quien raya</span>
+          <span class="line h-goth chrome chrome--ink melt h-right" aria-hidden="true">un cuaderno.</span>
         </h2>
 
         <div class="yo__grid">
@@ -104,9 +114,20 @@
 
         <div class="photos" data-cursor="arrastrar">
           <header class="photos__head">
-            <h3 data-reveal><span class="line">FUERA DEL <span class="goth">código</span></span></h3>
-            <span class="label">[ ROLLO PERSONAL — 05 FOTOS — ARRASTRA ↔ ]</span>
+            <h3 data-reveal aria-label="Fuera del código">
+              <span class="line h-graf h-graf--ink" aria-hidden="true">fuera del</span>
+              <span class="line h-goth chrome chrome--ink melt" aria-hidden="true">código</span>
+            </h3>
+            <div class="photos__cap" aria-live="polite">
+              <b data-cap-n>01</b>
+              <span data-cap-t>ANDREH</span>
+              <em data-cap-m>IMG_0001 · GT</em>
+            </div>
           </header>
+          <div class="photos__stage">
+            <canvas class="photos__gl" aria-hidden="true"></canvas>
+            <span class="photos__hint">[ arrastra ↔ — entre más rápido, más se derrite ]</span>
+          </div>
           <div class="photos__track">
             <figure class="print">
               <img src="/media/tono-andreh.webp" alt="Andreh recargado en una pared de mármol con un sticker que le tapa la cara" draggable="false" />
@@ -136,12 +157,14 @@
 
       <!-- ============ TRABAJO ============ -->
       <section class="trabajo" id="trabajo">
-        <div class="trabajo__bg" aria-hidden="true">TRABAJO&nbsp;TRABAJO</div>
         <div class="trabajo__pin">
           <header class="trabajo__head">
             <div>
               <div class="label">[ 02 — TRABAJO SELECCIONADO ]</div>
-              <h2 data-reveal><span class="line">05 FOTOGRAMAS</span><span class="line"><span class="goth">de código.</span></span></h2>
+              <h2 data-reveal aria-label="Trabajo: cinco fotogramas de código">
+                <span class="line h-goth chrome melt" aria-hidden="true">Trabajo</span>
+                <span class="line h-graf h-graf--lime" aria-hidden="true">05 fotogramas de código</span>
+              </h2>
             </div>
             <p class="trabajo__hint">Scrollea para girar el carrete.<br />Click en un cuadro para abrir el caso →</p>
           </header>
@@ -156,10 +179,9 @@
       <!-- ============ STACK ============ -->
       <section class="stack paper" id="stack">
         <div class="label">[ 03 — STACK / RECORRIDO ]</div>
-        <h2 class="stack__title" data-reveal>
-          <span class="line">HERRAMIENTAS</span>
-          <span class="line">QUE USO SIN</span>
-          <span class="line"><span class="goth stamp">miedo.</span></span>
+        <h2 class="stack__title" data-reveal aria-label="Herramientas que uso sin miedo">
+          <span class="line h-goth chrome chrome--ink melt" aria-hidden="true">Herramientas</span>
+          <span class="line h-graf h-graf--ink h-right" aria-hidden="true">que uso sin miedo</span>
         </h2>
         <p class="stack__note">← arrástralas, no muerden</p>
         <div class="tapes" id="tapes"></div>
@@ -171,9 +193,9 @@
       <section class="hablemos" id="hablemos">
         <svg class="sigil sigil--hablemos" data-sigil="21" data-strokes="6"></svg>
         <div class="label">[ 04 — HABLEMOS ]</div>
-        <p class="hablemos__crazy goth">¿tienes una<br />idea loca?</p>
+        <p class="hablemos__crazy h-graf h-graf--lime">¿tienes una<br />idea loca?</p>
         <div class="hablemos__stage">
-          <h2 class="hablemos__big" data-fit data-chars>HABLEMOS</h2>
+          <h2 class="hablemos__big h-goth melt" data-fit data-text="Hablemos"><span class="chrome">Hablemos</span></h2>
         </div>
 
         <div class="hablemos__row">
@@ -192,10 +214,10 @@
 
         <div class="marquee" aria-hidden="true">
           <div class="marquee__inner">
-            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
-            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
-            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
-            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
+            <span><em>disponible para proyectos</em> <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
+            <span><em>disponible para proyectos</em> <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
+            <span><em>disponible para proyectos</em> <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
+            <span><em>disponible para proyectos</em> <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
           </div>
         </div>
 

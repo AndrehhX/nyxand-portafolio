@@ -5,32 +5,63 @@ function rng(seed: number) {
   return () => ((s = (s * 9301 + 49297) % 233280) / 233280)
 }
 
-// Bordes de tinta rasgada entre secciones, con chorreados.
+// Cortes entre secciones: la página de arriba se rompe y deja ver capas de
+// sticker roto (lima + negro/blanco) antes de la siguiente sección, con
+// chorreados que cuelgan del borde. main.ts los anima con el scroll.
+const TW = 1000
+const TH = 240
+
+function jag(r: () => number, base: number, amp: number, minStep = 6, maxStep = 26) {
+  const pts: [number, number][] = []
+  let x = -30
+  let y = base
+  while (x < TW + 30) {
+    // caminata aleatoria + picos: borde de papel rasgado, no ruido uniforme
+    y += (r() - 0.5) * amp * 0.9
+    y += (base - y) * 0.25
+    const spike = r() < 0.12 ? (r() - 0.3) * amp * 1.6 : 0
+    pts.push([x, y + spike])
+    x += minStep + r() * (maxStep - minStep)
+  }
+  return pts
+}
+const fillDown = (pts: [number, number][]) =>
+  `M-30 -40 L${pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L')} L${TW + 30} -40 Z`
+
 export function buildTears() {
   document.querySelectorAll<HTMLElement>('.tear').forEach((el, idx) => {
     const from = el.dataset.from!
     const to = el.dataset.to!
-    el.style.background = `var(--${from})`
-    const W = 1000
-    const H = 120
-    const r = rng(idx * 13 + 5)
-    let d = `M-20 ${H + 10} L-20 60`
-    let x = -20
-    while (x < W + 20) {
-      x += 5 + r() * 20
-      const y = 34 + r() * 46
-      if (r() < 0.09) {
-        // chorreado: la tinta de arriba cae dentro del color de abajo
-        const w = 2 + r() * 5
-        const depth = H - 4 - r() * 30
-        d += ` L${x} ${y} L${x + w * 0.3} ${depth} Q${x + w / 2} ${depth + 6} ${x + w * 0.7} ${depth} L${x + w} ${y}`
-        x += w
-      } else {
-        d += ` L${x.toFixed(1)} ${y.toFixed(1)}`
-      }
+    el.style.background = `var(--${to})`
+    const r = rng(idx * 17 + 3)
+    const deep = from === 'ink' ? '#f1efe8' : '#000'
+
+    const front = jag(r, TH * 0.3, 34)
+    const fiber = front.map(([x, y]) => [x, y + 3 + r() * 7] as [number, number])
+    const lime = jag(r, TH * 0.5, 40, 10, 40)
+    const back = jag(r, TH * 0.7, 30, 8, 30)
+
+    // chorreados del color de arriba
+    let drips = ''
+    for (let i = 0; i < 16; i++) {
+      const p = front[Math.floor(r() * front.length)]
+      const w = 4 + r() * 12
+      const len = 30 + r() * 150
+      const x = p[0]
+      const y0 = 4
+      const y1 = p[1] + len
+      drips += `M${x - w / 2} ${y0} L${x - w / 2} ${y1 - w} Q${x - w / 2} ${y1 + w * 0.4} ${x} ${y1 + w * 0.5} Q${x + w / 2} ${y1 + w * 0.4} ${x + w / 2} ${y1 - w} L${x + w / 2} ${y0} Z `
     }
-    d += ` L${W + 20} ${H + 10} Z`
-    el.innerHTML = `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="var(--${to})" filter="url(#rough)"/></svg>`
+
+    const svg = (cls: string, d: string, fill: string, filter = 'url(#rough)') =>
+      `<svg class="tear__l tear__l--${cls}" viewBox="0 0 ${TW} ${TH}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="${fill}" filter="${filter}"/></svg>`
+
+    el.innerHTML =
+      svg('back', fillDown(back), deep) +
+      svg('lime', fillDown(lime), 'var(--lime)') +
+      svg('fiber', fillDown(fiber), '#f4f2ec') +
+      svg('front', fillDown(front), `var(--${from})`) +
+      svg('drips', drips, `var(--${from})`, 'none')
   })
 }
 
@@ -152,6 +183,23 @@ export function fitText() {
     const avail = el.parentElement!.clientWidth - parseFloat(getComputedStyle(el.parentElement!).paddingLeft) * 2
     el.style.fontSize = `${(avail / w) * 100}px`
   })
+}
+
+// Texto que se "decodifica" con glifos de ruido antes de asentarse
+const NOISE = '▓▒░#/\\_01<>*'
+const scrambling = new WeakMap<HTMLElement, number>()
+export function scramble(el: HTMLElement, text: string, ms = 420) {
+  cancelAnimationFrame(scrambling.get(el) ?? 0)
+  const t0 = performance.now()
+  const tick = () => {
+    const p = Math.min(1, (performance.now() - t0) / ms)
+    const fixed = Math.floor(text.length * p)
+    el.textContent =
+      text.slice(0, fixed) +
+      [...text.slice(fixed)].map((c) => (c === ' ' ? ' ' : NOISE[(Math.random() * NOISE.length) | 0])).join('')
+    if (p < 1) scrambling.set(el, requestAnimationFrame(tick))
+  }
+  tick()
 }
 
 export function splitChars() {
