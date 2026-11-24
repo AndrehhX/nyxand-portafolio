@@ -286,13 +286,74 @@ export function initSpray() {
 
 // Cada titular .melt tiene su propio filtro: se derrite con la velocidad
 // del scroll (global) y además al pasarle el cursor encima.
+// Ruido de columnas precalculado UNA vez en un canvas. Antes cada filtro
+// usaba feTurbulence, que el navegador recalcula (en CPU) cada vez que cambia
+// la escala del derretido: eso era lo que trababa el scroll.
+let meltNoise = ''
+function columnNoise() {
+  if (meltNoise) return meltNoise
+  const W = 512
+  const H = 16
+  const c = document.createElement('canvas')
+  c.width = W
+  c.height = H
+  const o = c.getContext('2d')!
+  const img = o.createImageData(W, H)
+  const knots = Array.from({ length: 90 }, () => Math.random())
+  const fine = Array.from({ length: 260 }, () => Math.random())
+  const smooth = (arr: number[], t: number) => {
+    const x = t * (arr.length - 1)
+    const i = Math.floor(x)
+    const f = x - i
+    const s = f * f * (3 - 2 * f)
+    return arr[i] * (1 - s) + arr[Math.min(i + 1, arr.length - 1)] * s
+  }
+  for (let x = 0; x < W; x++) {
+    const v = smooth(knots, x / W) * 0.75 + smooth(fine, x / W) * 0.25
+    for (let y = 0; y < H; y++) {
+      const p = (y * W + x) * 4
+      const g = Math.round((v * 0.92 + (y / H) * 0.08) * 255)
+      img.data[p] = 128
+      img.data[p + 1] = g
+      img.data[p + 2] = 128
+      img.data[p + 3] = 255
+    }
+  }
+  o.putImageData(img, 0, 0)
+  return (meltNoise = c.toDataURL())
+}
+
 export function initMeltables() {
-  const src = document.getElementById('melt')!
+  const defs = document.querySelector('svg.defs')!
+  const NS = 'http://www.w3.org/2000/svg'
+  const noise = columnNoise()
   const items = [...document.querySelectorAll<HTMLElement>('.melt')].map((el, i) => {
-    const f = src.cloneNode(true) as SVGFilterElement
+    const f = document.createElementNS(NS, 'filter')
     f.id = `melt-${i}`
-    f.querySelector('feTurbulence')!.setAttribute('seed', String(3 + i * 7))
-    src.parentNode!.appendChild(f)
+    f.setAttribute('x', '-2%')
+    f.setAttribute('y', '-10%')
+    f.setAttribute('width', '104%')
+    f.setAttribute('height', '170%')
+    f.setAttribute('color-interpolation-filters', 'sRGB')
+    f.innerHTML =
+      `<feImage href="${noise}" preserveAspectRatio="none" result="n"/>` +
+      `<feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 -0.6 0 0 0.5  0 0 0 0 0.5  0 0 0 0 1" result="m"/>` +
+      `<feDisplacementMap in="SourceGraphic" in2="m" scale="10" xChannelSelector="R" yChannelSelector="G"/>`
+    defs.appendChild(f)
+    const image = f.querySelector('feImage')!
+    // cada título usa un tramo distinto del ruido
+    const shift = Math.random()
+    const fit = () => {
+      const w = el.offsetWidth
+      const h = el.offsetHeight
+      image.setAttribute('x', String(-shift * w))
+      image.setAttribute('y', String(-h * 0.1))
+      image.setAttribute('width', String(w * 2))
+      image.setAttribute('height', String(h * 1.8))
+    }
+    fit()
+    addEventListener('resize', fit)
+    document.fonts.ready.then(fit)
     el.style.filter = `url(#melt-${i})`
     const map = f.querySelector('feDisplacementMap')!
     const it = { el, map, hover: 0, target: 0, shown: -1 }
@@ -308,7 +369,8 @@ export function initMeltables() {
   return (velocity: number) => {
     items.forEach((it) => {
       it.hover += (it.target - it.hover) * (it.target ? 0.05 : 0.08)
-      const s = Math.round(10 + velocity + it.hover)
+      // en pasos de 3px: menos re-filtrados, el ojo no nota la diferencia
+      const s = Math.round((10 + velocity + it.hover) / 3) * 3
       if (s !== it.shown) {
         it.shown = s
         it.map.setAttribute('scale', String(s))

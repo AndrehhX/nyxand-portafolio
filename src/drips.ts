@@ -170,6 +170,12 @@ export function initDrips(getVelocity: () => number, reduce: boolean) {
       requestAnimationFrame(once)
       return
     }
-    gsap.ticker.add(tick)
+    // 30 fps: la pintura baja lento y cada actualización re-filtra el SVG (goo)
+    let lastT = 0
+    gsap.ticker.add((t) => {
+      if (t - lastT < 1 / 31) return
+      lastT = t
+      tick()
+    })
   })
 }

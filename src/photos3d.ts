@@ -35,15 +35,9 @@ const frag = /* glsl */ `
 
   float hash(float n){ return fract(sin(n) * 43758.5453); }
   float noise(float x){ float i = floor(x); float f = fract(x); f = f*f*(3.0-2.0*f); return mix(hash(i), hash(i+1.0), f); }
-  float bayer4(vec2 p){
-    p = mod(p, 4.0);
-    int i = int(p.x) + int(p.y) * 4;
-    float m[16];
-    m[0]=0.;m[1]=8.;m[2]=2.;m[3]=10.;m[4]=12.;m[5]=4.;m[6]=14.;m[7]=6.;
-    m[8]=3.;m[9]=11.;m[10]=1.;m[11]=9.;m[12]=15.;m[13]=7.;m[14]=13.;m[15]=5.;
-    for(int k=0;k<16;k++){ if(k==i) return (m[k]+0.5)/16.0; }
-    return 0.5;
-  }
+  // Bayer 4×4 aritmético (sin arreglos ni bucles por píxel)
+  float bayer2(vec2 a){ a = floor(a); return fract(dot(a, vec2(0.5, a.y * 0.75))); }
+  float bayer4(vec2 p){ return bayer2(0.5 * p) * 0.25 + bayer2(p) + 1.0 / 32.0; }
   float luma(vec3 c){ return dot(c, vec3(0.299, 0.587, 0.114)); }
 
   vec2 cover(vec2 uv){
@@ -96,7 +90,7 @@ export async function initPhotos3D(
 ): Promise<boolean> {
   let renderer: THREE.WebGLRenderer
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true })
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true })
   } catch {
     return false
   }
@@ -218,7 +212,7 @@ export async function initPhotos3D(
   let lastFrame = 0
   function frame(now = 0) {
     requestAnimationFrame(frame)
-    if (!visible || now - lastFrame < glFrameMs) return
+    if (!visible || now - lastFrame < Math.max(glFrameMs, 14)) return // tope ~60 fps
     lastFrame = now
     const t = clock.getElapsedTime()
     if (!dragging) {

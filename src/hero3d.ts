@@ -39,15 +39,10 @@ const HeroShader = {
     varying vec2 vUv;
 
     float hash(float n){ return fract(sin(n) * 43758.5453); }
-    float bayer4(vec2 p){
-      p = mod(p, 4.0);
-      int i = int(p.x) + int(p.y) * 4;
-      float m[16];
-      m[0]=0.;m[1]=8.;m[2]=2.;m[3]=10.;m[4]=12.;m[5]=4.;m[6]=14.;m[7]=6.;
-      m[8]=3.;m[9]=11.;m[10]=1.;m[11]=9.;m[12]=15.;m[13]=7.;m[14]=13.;m[15]=5.;
-      for(int k=0;k<16;k++){ if(k==i) return (m[k]+0.5)/16.0; }
-      return 0.5;
-    }
+    // Bayer 4×4 con aritmética pura: sin arreglos ni bucles por píxel
+    // (los arreglos indexados en el fragment shader eran lo más caro en ANGLE/D3D11)
+    float bayer2(vec2 a){ a = floor(a); return fract(dot(a, vec2(0.5, a.y * 0.75))); }
+    float bayer4(vec2 p){ return bayer2(0.5 * p) * 0.25 + bayer2(p) + 1.0 / 32.0; }
     float luma(vec3 c){ return dot(c, vec3(0.299, 0.587, 0.114)); }
 
     // "cover" de la foto, encuadrando la cara (≈40% desde arriba)
@@ -158,7 +153,8 @@ export type Hero = { drop: (onImpact?: (i: number) => void) => Promise<void> }
 export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Promise<Hero | null> {
   let renderer: THREE.WebGLRenderer
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: !lite, powerPreference: 'high-performance' })
+    // sin antialias: el canvas sólo recibe el pase final tramado, el MSAA no se ve
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' })
   } catch {
     return null
   }
@@ -191,8 +187,10 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
   scene.add(limeLight)
 
   const uniforms = { uTime: { value: 0 }, uTwist: { value: 0.4 }, uMelt: { value: 0 } }
-  const chrome = new THREE.MeshPhysicalMaterial({
-    color: 0xffffff, metalness: 1, roughness: 0.08, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.6,
+  // Standard en vez de Physical: el clearcoat duplicaba el cálculo especular
+  // y con metalness 1 + roughness baja el cromo se ve prácticamente igual
+  const chrome = new THREE.MeshStandardMaterial({
+    color: 0xffffff, metalness: 1, roughness: 0.07, envMapIntensity: 1.75,
   })
   chrome.onBeforeCompile = (sh) => {
     Object.assign(sh.uniforms, uniforms)
@@ -274,7 +272,14 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
     group.userData.h = all.max.y - all.min.y
   }
 
-  const composer = new EffectComposer(renderer)
+  // La escena se renderiza a ~70% de resolución en un target de 8 bits: el
+  // tramado toma una muestra por celda de 3px, así que no se nota la
+  // diferencia y la GPU pinta la mitad de píxeles. El pase final sí va a
+  // resolución completa.
+  const SCENE_SCALE = lite ? 0.55 : 0.7
+  const rt = new THREE.WebGLRenderTarget(1, 1, { type: THREE.UnsignedByteType })
+  const composer = new EffectComposer(renderer, rt)
+  composer.setPixelRatio(dpr * SCENE_SCALE)
   composer.addPass(new RenderPass(scene, camera))
   const fx = new ShaderPass(HeroShader)
   fx.uniforms.tPhoto.value = photo
@@ -387,10 +392,13 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
 
     composer.render()
   }
+  // tope de ~60 fps: en pantallas de 120/144 Hz renderizar cada refresco
+  // duplicaba el trabajo de la GPU sin que el tramado se viera más fluido
+  const minFrame = Math.max(glFrameMs, 14)
   let lastFrame = 0
   function frame(now = 0) {
     requestAnimationFrame(frame)
-    if (!visible || !lines.length || now - lastFrame < glFrameMs) return
+    if (!visible || !lines.length || now - lastFrame < minFrame) return
     lastFrame = now
     render()
   }
