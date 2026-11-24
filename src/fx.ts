@@ -100,7 +100,9 @@ export function buildTapes() {
   TECHS.forEach((t, i) => {
     const el = document.createElement('div')
     el.className = 'tape'
-    const kind = i === 4 ? 'lime' : i % 4 === 2 ? 'ink' : ''
+    const kind = t === 'Tauri' || i % 4 === 2 ? 'ink' : i === 4 ? 'lime' : ''
+    const restingZ = i + 1
+    el.style.zIndex = String(restingZ)
     const rot = (r() - 0.5) * 12
     let x = 0
     let y = (r() - 0.5) * 14
@@ -124,6 +126,8 @@ export function buildTapes() {
         el.removeEventListener('pointerup', up)
         el.removeEventListener('pointercancel', up)
         el.classList.remove('is-drag')
+        // No dejar una cinta arrastrada encima de las siguientes para siempre.
+        el.style.zIndex = String(restingZ)
       }
       el.addEventListener('pointermove', mv)
       el.addEventListener('pointerup', up)
