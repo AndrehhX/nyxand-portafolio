@@ -973,6 +973,75 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
   .photos__stage { height: 72svh; }
 }
 
+/* ==============================================================
+   v5 — MENOS ES MÁS: una sola display (graffiti), color plano,
+   el lima sólo como acento. Mono para todo lo demás.
+   ============================================================== */
+.h-goth,
+.h-graf {
+  font-family: var(--graf);
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  line-height: 0.86;
+  text-shadow: none;
+}
+.chrome,
+.chrome--ink {
+  background: none;
+  -webkit-background-clip: border-box;
+  background-clip: border-box;
+  color: inherit;
+  padding-bottom: 0;
+}
+.paper .h-goth, .paper .h-graf { color: var(--ink); }
+.trabajo .h-goth, .hablemos .h-goth { color: var(--paper); }
+/* acento: una sola palabra/línea por título, en marcador lima */
+.h-graf--ink { width: fit-content; padding: 0.04em 0.22em 0.1em; background: var(--lime); color: var(--ink) !important; }
+.h-graf--lime { color: var(--lime) !important; }
+
+.hud__logo { font-family: var(--graf); font-weight: 400; font-size: 24px; letter-spacing: 0; }
+.hud__logo span { opacity: 0.35; }
+
+/* hero: la firma acompaña, no compite con el 3D */
+.tag { rotate: -4deg; bottom: clamp(70px, 11vh, 110px); }
+.tag__name { font-size: clamp(40px, 5vw, 86px); text-shadow: 0.04em 0.04em 0 #000; }
+.tag__meta { margin-top: 0.7em; }
+
+/* YO */
+.yo__title .h-goth { font-size: clamp(54px, 9.6vw, 180px); }
+.yo__title .h-graf { font-size: clamp(34px, 5vw, 92px); margin: 0.1em 0 0.18em 4%; rotate: -2deg; }
+.sigil--yo { opacity: 0.6; }
+
+/* fotos */
+.photos__head .h-graf { font-size: clamp(30px, 4vw, 70px); margin-bottom: 0.12em; rotate: -2deg; }
+.photos__head .h-goth { font-size: clamp(60px, 9vw, 170px); }
+.photos__cap b { text-shadow: none; }
+.photos__cap span { font-family: var(--graf); }
+
+/* TRABAJO */
+.trabajo__head .h-goth { font-size: clamp(60px, 7.4vw, 136px); }
+.trabajo__head .h-graf { font-size: clamp(22px, 2.2vw, 38px); rotate: 0deg; margin: 0.25em 0 0 0.1em; }
+.frame__meta h3 { font-family: var(--graf); font-weight: 400; font-size: clamp(30px, 2.4vw, 42px); line-height: 0.95; letter-spacing: 0; }
+.case__title { font-family: var(--graf); font-weight: 400; letter-spacing: 0; }
+
+/* STACK */
+.stack__title .h-goth { font-size: clamp(54px, 9.6vw, 180px); }
+.stack__title .h-graf { font-size: clamp(30px, 4.6vw, 84px); rotate: -2deg; margin-top: 0.15em; }
+.stack__note { font-family: var(--graf); font-weight: 400; }
+.tape__paper { font-family: var(--mono); font-weight: 800; font-size: clamp(15px, 1.5vw, 22px); letter-spacing: 0.02em; text-transform: uppercase; padding: 14px 26px 12px; }
+.doodle figcaption { font-family: var(--graf); font-weight: 400; font-size: 22px; }
+
+/* HABLEMOS */
+.sigil--hablemos { display: none; }
+.hablemos__crazy.h-graf { font-size: clamp(32px, 4.4vw, 80px); margin: 0.7em 0 0.3em; rotate: -2deg; }
+.hablemos__big::before { color: #151514; }
+.marquee b { font-family: var(--graf); font-weight: 400; font-size: 1em; }
+.frame__shot--end em { font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: 0.1em; rotate: 0deg; }
+
+@media (max-width: 760px) {
+  .tag__name { font-size: 10.5vw; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .melt { filter: none; }

@@ -7,7 +7,7 @@ La dirección visual mezcla lo hecho a mano (tinta, brocha, papel rasgado, garab
 
 - **Hero WebGL**: "NyxAnd" en blackletter 3D extruido de cromo, con piercings, pasado por un shader de dithering 1-bit. El cursor abre una lente que revela el cromo real, mantener presionado derrite las letras y el scroll las desintegra en píxeles.
 - **Intro**: contador en pixel-gótico mientras carga el 3D; luego las letras caen con impacto (temblor de cámara y flash) y el nombre se pinta como tag de aerosol que chorrea.
-- **Tipografía urbana**: gótico de cromo (Grenze Gotisch) + graffiti (Sedgwick Ave Display). Los titulares se derriten con un filtro SVG cuya intensidad depende de la velocidad del scroll.
+- **Tipografía urbana**: una sola display, graffiti (Sedgwick Ave Display), también en el NyxAnd 3D; mono para el resto y lima sólo como acento. Los titulares se derriten con un filtro SVG cuya intensidad depende de la velocidad del scroll.
 - **Cortes multicapa**: entre secciones la página se rompe y deja ver capas de sticker roto lima y negro/blanco, con chorreados que se estiran con el scroll.
 - **Foto real tramada** a 1-bit como fondo del hero, y carrusel WebGL infinito "Fuera del código" que se arquea y se derrite según la velocidad del arrastre.
 - **Capturas reales** de Orunei y Kaze en el carrete (se revelan a color al pasar el cursor).

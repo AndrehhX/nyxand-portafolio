@@ -1,4 +1,4 @@
-// Hero WebGL: "NyxAnd" en blackletter 3D de cromo con piercings, tramado a
+// Hero WebGL: "NyxAnd" en graffiti 3D de cromo con piercings, tramado a
 // 1-bit sobre la foto de Andreh. El cursor abre una lente que revela el
 // cromo real, mantener presionado derrite las letras, el scroll lo
 // desintegra en píxeles y cada tanto hay ráfagas de glitch.
@@ -8,7 +8,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import gsap from 'gsap'
 import opentype from 'opentype.js'
-import fontUrl from '@fontsource/grenze-gotisch/files/grenze-gotisch-latin-900-normal.woff?url'
+import fontUrl from '@fontsource/sedgwick-ave-display/files/sedgwick-ave-display-latin-400-normal.woff?url'
 
 const PHOTO = '/media/tono-andreh.webp'
 

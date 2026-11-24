@@ -292,12 +292,12 @@ function extrude() {
   const draw = () => {
     m.x += (m.tx - m.x) * 0.08
     m.y += (m.ty - m.y) * 0.08
-    const depth = 16
-    const dx = -m.x * 2.4 + 0.25
-    const dy = -m.y * 2.4 + 0.5
+    const depth = 10
+    const dx = -m.x * 1.8 + 0.2
+    const dy = -m.y * 1.8 + 0.4
     const layers: string[] = []
     for (let i = 1; i <= depth; i++) {
-      const c = i === depth ? 'var(--lime)' : i % 2 ? '#1d1d1b' : '#2a2a28'
+      const c = i === depth ? 'var(--lime)' : '#1f1f1d'
       layers.push(`${(dx * i).toFixed(1)}px ${(dy * i + i * 0.6).toFixed(1)}px 0 ${c}`)
     }
     el.style.setProperty('--ts', layers.join(','))
