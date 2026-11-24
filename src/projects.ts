@@ -22,9 +22,10 @@ export const projects: Project[] = [
     id: '01',
     name: 'KAZE',
     kind: 'Plataforma de anime y manga',
-    desc: 'Web + app Android con una sola cuenta: streaming, lector y watch parties.',
-    long: 'Plataforma para descubrir, ver y seguir anime y manga. Una web en Next.js y una app Android nativa en Kotlin comparten cuenta y base de datos, así que biblioteca, progreso, amigos y salas se sincronizan entre web y móvil.',
+    desc: '15.000+ usuarios autenticados en Supabase; VPS, workers, monitoreo, AniList y Cloudflare Pages.',
+    long: 'Kaze ya tiene más de 15.000 usuarios autenticados en Supabase. La plataforma combina web en Next.js y app Android nativa en Kotlin con workers y monitoreo en VPS, despliegue web en Cloudflare Pages e integración con AniList. Biblioteca, progreso, amigos y salas se sincronizan entre web y móvil.',
     highlights: [
+      'Más de 15.000 usuarios autenticados en Supabase; workers y monitoreo corren en VPS, y la web está desplegada en Cloudflare Pages.',
       'Reproductor HLS con varios servidores y cambio automático si uno falla; salto de opening/ending con AniSkip.',
       'Watch parties sincronizadas en tiempo real con chat, reacciones y compensación de latencia.',
       'App Android en Kotlin + Jetpack Compose que funciona sin conexión (Room) y se sincroniza sola.',

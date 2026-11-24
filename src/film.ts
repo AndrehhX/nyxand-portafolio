@@ -78,6 +78,14 @@ export function buildFilm() {
         <span class="frame__num">${p.id}</span>
         <span class="frame__status">${p.status.toUpperCase()}</span>
       </button>
+      <div class="frame__quicklinks">${p.links
+        .filter((l) => /plataforma|demo|c[oó]digo|repositorio/i.test(l.label))
+        .slice(0, 2)
+        .map((l) => {
+          const label = /c[oó]digo|repositorio/i.test(l.label) ? 'CÓDIGO' : 'DEMO'
+          return `<a href="${l.href}" target="_blank" rel="noopener" data-cursor="${label === 'DEMO' ? 'abrir demo' : 'ver código'}">${label} ↗</a>`
+        })
+        .join('')}</div>
       <div class="frame__meta">
         <h3 class="chrome">${titleCase(p.name)}</h3>
         <p>${p.kind}. ${p.desc}</p>

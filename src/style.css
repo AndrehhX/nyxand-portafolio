@@ -580,6 +580,19 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
 }
 .frame__meta p { font-size: 12px; opacity: 0.8; max-width: 40ch; }
 .frame__meta span { display: block; margin-top: 8px; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--lime); }
+.frame__quicklinks { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 9px; }
+.frame__quicklinks:empty { display: none; }
+.frame__quicklinks a {
+  padding: 5px 8px;
+  border: 1px solid #55564c;
+  color: var(--paper);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  transition: color 0.18s, background-color 0.18s, border-color 0.18s;
+}
+.frame__quicklinks a:hover,
+.frame__quicklinks a:focus-visible { color: var(--ink); background: var(--lime); border-color: var(--lime); }
 
 .frame__shot--end {
   display: flex;
