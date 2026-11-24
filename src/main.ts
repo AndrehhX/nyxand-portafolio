@@ -45,6 +45,38 @@ const yieldMain = () => new Promise<void>((r) => setTimeout(r, 0))
 runIntro()
 const booted = boot()
 
+// Color del menú según la sección que tiene debajo (reemplaza al
+// mix-blend-mode, que era caro sobre los canvas animados)
+function initHudTheme() {
+  const root = document.documentElement
+  let dark = false
+  let last = 0
+  let trailing: number | undefined
+  const check = (force = false) => {
+    const now = performance.now()
+    // revisa a lo mucho cada 120 ms mientras hay scroll y una vez más al parar
+    clearTimeout(trailing)
+    trailing = window.setTimeout(() => check(true), 140)
+    if (!force && now - last < 120) return
+    last = now
+    const under = document.elementsFromPoint(innerWidth / 2, 30).find((e) => !e.closest('.hud, .cursor, .spray, .grain, .progress'))
+    // en un corte cuenta su color de arriba o de abajo según dónde cae el menú
+    const tear = under?.closest<HTMLElement>('.tear')
+    let want: boolean
+    if (tear) {
+      const r = tear.getBoundingClientRect()
+      want = (30 - r.top < r.height * 0.5 ? tear.dataset.from : tear.dataset.to) === 'paper'
+    } else want = !!under?.closest('.paper')
+    if (want !== dark) {
+      dark = want
+      root.classList.toggle('hud-dark', dark)
+    }
+  }
+  addEventListener('scroll', () => check(), { passive: true })
+  setTimeout(() => check(true), 500)
+}
+initHudTheme()
+
 async function boot() {
   initGrain()
   initClock()
@@ -90,12 +122,17 @@ function initMelt() {
     if (v) scrollFx.dir = v > 0 ? 1 : -1
     scrollFx.v = v
   }, { passive: true })
-  gsap.ticker.add(() => {
+  let meltT = 0
+  gsap.ticker.add((t) => {
     cur += (target - cur) * 0.12
     target *= 0.9
     scrollFx.v *= 0.9
-    // en modo liviano el derretido por scroll se apaga (filtro SVG caro en GPU débil)
-    updateMelt(lite ? 0 : cur)
+    // el filtro del derretido se re-pinta en CPU: máximo 24 veces por segundo
+    // (sigue viéndose líquido); en modo liviano el de scroll se apaga
+    if (t - meltT > 1 / 24) {
+      meltT = t
+      updateMelt(lite ? 0 : cur)
+    }
     skew += (Math.max(-7, Math.min(7, scrollFx.v * 0.12)) - skew) * 0.15
     // tocar una var en :root recalcula estilos de todo: sólo si cambió
     const s = Math.abs(skew) < 0.02 ? '0' : skew.toFixed(2)

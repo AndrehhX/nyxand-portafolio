@@ -112,16 +112,20 @@ ul { list-style: none; }
   padding: 14px var(--gut);
   font-size: 11px;
   letter-spacing: 0.1em;
-  color: #fff;
-  mix-blend-mode: difference;
+  /* sin mix-blend-mode: sobre canvas animados obligaba a copiar todo lo de
+     atrás en cada frame. El color cambia según la sección (main.ts) */
+  color: var(--paper);
+  transition: color 0.3s ease;
 }
+.hud-dark .hud { color: var(--ink); }
+.hud-dark .hud__dot { background: var(--ink); }
 .hud__logo { font-family: var(--display); font-size: 22px; letter-spacing: 0.02em; line-height: 1; }
 .hud__logo span { opacity: 0.45; }
 .hud__nav { display: flex; gap: clamp(14px, 2.2vw, 30px); }
 .hud__nav a:hover { text-decoration: line-through; }
 .hud__cta { display: none; }
 .hud__time { display: flex; align-items: center; gap: 8px; font-variant-numeric: tabular-nums; }
-.hud__dot { width: 6px; height: 6px; background: #fff; animation: blink 1s steps(1) infinite; }
+.hud__dot { width: 6px; height: 6px; background: var(--paper); animation: blink 1s steps(1) infinite; }
 
 /* ---------- HERO ---------- */
 .hero {
@@ -546,7 +550,7 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
   font-size: 64px;
   line-height: 0.8;
   color: var(--paper);
-  mix-blend-mode: difference;
+  text-shadow: 0.04em 0.04em 0 var(--ink);
 }
 .frame__status {
   position: absolute;
@@ -1045,7 +1049,9 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
 .spray { position: fixed; inset: 0; width: 100vw; height: 100vh; z-index: 86; pointer-events: none; }
 
 /* titulares: se inclinan con la velocidad del scroll */
-.yo__title, .stack__title, .trabajo__head h2, .photos__head h3 { transform: skewY(var(--skew, 0deg)); transform-origin: 0 50%; }
+/* will-change: cada título en su propia capa → la inclinación la hace la GPU
+   sin volver a pintar el texto ni su filtro */
+.yo__title, .stack__title, .trabajo__head h2, .photos__head h3 { transform: skewY(var(--skew, 0deg)); transform-origin: 0 50%; will-change: transform; }
 .melt { cursor: crosshair; }
 
 /* párrafos palabra por palabra */

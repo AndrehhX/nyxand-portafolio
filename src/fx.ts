@@ -184,6 +184,7 @@ export function initSpray() {
   const c = document.createElement('canvas')
   c.className = 'spray'
   c.setAttribute('aria-hidden', 'true')
+  c.style.display = 'none'
   document.body.appendChild(c)
   const o = c.getContext('2d')!
   let dpr = 1
@@ -249,14 +250,17 @@ export function initSpray() {
     if (!first && still > 14 && still < 50 && still % 12 === 0) {
       ps.push({ x: lx + gauss() * 10, y: ly + 4, y0: ly + 4, vy: 0.5 + Math.random() * 0.8, r: 1 + Math.random() * 1.4, life: 0, max: 100 + Math.random() * 50, drip: true, col })
     }
-    // sin partículas no se toca el canvas (cero costo en reposo)
+    // sin partículas el canvas se saca del render: un canvas de pantalla
+    // completa, aunque esté vacío, se compone en cada frame
     if (!ps.length) {
       if (dirty) {
         o.clearRect(0, 0, c.width, c.height)
+        c.style.display = 'none'
         dirty = false
       }
       return
     }
+    if (!dirty) c.style.display = ''
     dirty = true
     o.clearRect(0, 0, c.width, c.height)
     for (let i = ps.length - 1; i >= 0; i--) {
@@ -310,9 +314,11 @@ function columnNoise() {
   }
   for (let x = 0; x < W; x++) {
     const v = smooth(knots, x / W) * 0.75 + smooth(fine, x / W) * 0.25
+    // rango y forma como feTurbulence (centrado en 0.5, ±0.25) y constante
+    // en vertical: sólo columnas que bajan, nada de cortes horizontales
+    const g = Math.round((0.5 + (v - 0.5) * 0.5) * 255)
     for (let y = 0; y < H; y++) {
       const p = (y * W + x) * 4
-      const g = Math.round((v * 0.92 + (y / H) * 0.08) * 255)
       img.data[p] = 128
       img.data[p + 1] = g
       img.data[p + 2] = 128
@@ -356,7 +362,9 @@ export function initMeltables() {
     document.fonts.ready.then(fit)
     el.style.filter = `url(#melt-${i})`
     const map = f.querySelector('feDisplacementMap')!
-    const it = { el, map, hover: 0, target: 0, shown: -1 }
+    // data-melt-scroll="off": sólo se derrite con el cursor (títulos muy pesados)
+    const scroll = el.dataset.meltScroll !== 'off'
+    const it = { el, map, hover: 0, target: 0, shown: -1, scroll }
     el.addEventListener('pointerenter', () => (it.target = 70))
     el.addEventListener('pointerleave', () => (it.target = 0))
     return it
@@ -370,7 +378,7 @@ export function initMeltables() {
     items.forEach((it) => {
       it.hover += (it.target - it.hover) * (it.target ? 0.05 : 0.08)
       // en pasos de 3px: menos re-filtrados, el ojo no nota la diferencia
-      const s = Math.round((10 + velocity + it.hover) / 3) * 3
+      const s = Math.round((10 + (it.scroll ? velocity : 0) + it.hover) / 3) * 3
       if (s !== it.shown) {
         it.shown = s
         it.map.setAttribute('scale', String(s))
