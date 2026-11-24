@@ -34,8 +34,17 @@ function glyphs(text, x, y, size) {
   let cx = x
   const gs = [...text].map(glyphFor)
   gs.forEach((g, i) => {
-    d += g.getPath(cx, y, size).toPathData(2)
-    cx += g.advanceWidth * scale + (gs[i + 1] ? font.getKerningValue(g, gs[i + 1]) * scale : 0)
+    // opentype.js genera "NaN" al formatear posiciones con basura de punto
+    // flotante (p. ej. 303.76000000000005): se redondea antes de dibujar.
+    // Por seguridad, cualquier contorno que aún salga inválido se descarta.
+    d += g.getPath(Math.round(cx * 100) / 100, y, size).toPathData(2)
+      .split(/(?=M)/)
+      .filter((c) => !c.includes('NaN'))
+      .join('')
+    // algunos pares (p. ej. "ie") devuelven un kerning inválido; un NaN aquí
+    // rompía todo el trazo desde esa letra en adelante
+    const k = gs[i + 1] ? Number(font.getKerningValue(g, gs[i + 1])) : 0
+    cx += g.advanceWidth * scale + (Number.isFinite(k) ? k * scale : 0)
   })
   return d
 }

@@ -19,7 +19,7 @@ La idea es simple: que el sitio en sí demuestre lo que sé hacer. WebGL, shader
 
 <img src="docs/readme/t-lo-que-tiene.svg" alt="Lo que tiene" width="100%" />
 
-| | |
+| Pieza | Qué hace |
 |---|---|
 | **Hero 3D** | "NyxAnd" en graffiti extruido de cromo, con piercings, tramado a 1-bit sobre mi foto. La lente del cursor revela el cromo; mantener presionado lo derrite; el scroll lo desintegra en píxeles. |
 | **Intro** | Contador mientras carga el 3D, letras que caen con impacto y mi nombre pintado como tag de aerosol. |
