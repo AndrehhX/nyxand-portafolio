@@ -1153,6 +1153,28 @@ a, button { transition: color 0.25s ease, background-color 0.25s ease, opacity 0
 .case__num { margin-top: -0.5em; text-align: right; -webkit-text-stroke: 2px var(--ink); }
 .case__title { font-size: clamp(48px, 7.4vw, 92px); line-height: 0.9; margin-top: -0.3em; }
 
+/* carrete: título compacto y el cilindro usa TODO el alto que queda,
+   centrado, para que nunca se corte abajo en pantallas bajas */
+@media (min-width: 900px) {
+  .trabajo__pin {
+    height: 100svh;
+    min-height: 620px;
+    justify-content: flex-start;
+    gap: clamp(10px, 2vh, 22px);
+    padding: clamp(70px, 9vh, 92px) 0 clamp(18px, 3vh, 34px);
+  }
+  .trabajo__head .h-goth { font-size: clamp(54px, min(6vw, 11vh), 112px); }
+  .trabajo__head .h-graf { font-size: clamp(20px, min(1.9vw, 3.6vh), 34px); }
+  .film { flex: 1 1 auto; min-height: 0; height: auto; perspective-origin: 50% 50%; }
+  /* la inclinación 3D (rotateX) agranda la parte de abajo del cuadro de
+     enfrente: se deja aire abajo y se sube un poco para que se vea centrado */
+  .film { margin-bottom: clamp(14px, 4vh, 44px); }
+  .film__track { height: min(calc(100% - 36px), 520px); width: clamp(300px, min(26vw, 44vh), 400px); translate: -50% -55%; }
+  .frame { display: flex; flex-direction: column; }
+  .frame__shot { flex: 1 1 0; min-height: 110px; aspect-ratio: auto; }
+  .frame__meta { flex: none; }
+}
+
 /* frames: el número parpadea al estar al frente */
 .frame.is-front .frame__num { animation: blink 0.9s steps(1) 3; color: var(--lime); }
 
