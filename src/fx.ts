@@ -25,6 +25,24 @@ function jag(r: () => number, base: number, amp: number, minStep = 6, maxStep = 
   }
   return pts
 }
+// Fibras del papel dibujadas en la propia forma: antes las ponía un filtro
+// SVG de ruido (feTurbulence) sobre franjas de pantalla completa, y su
+// rasterizado en GPU costaba ~100 ms cada vez que se invalidaba (tirones).
+function roughen(pts: [number, number][], r: () => number, amt: number) {
+  const out: [number, number][] = []
+  for (let i = 0; i < pts.length - 1; i++) {
+    const [x0, y0] = pts[i]
+    const [x1, y1] = pts[i + 1]
+    out.push([x0, y0])
+    const k = 2 + Math.floor(r() * 3)
+    for (let j = 1; j <= k; j++) {
+      const t = j / (k + 1)
+      out.push([x0 + (x1 - x0) * t + (r() - 0.5) * 1.6, y0 + (y1 - y0) * t + (r() - 0.5) * amt])
+    }
+  }
+  out.push(pts[pts.length - 1])
+  return out
+}
 // top: las capas de atrás arrancan dentro del corte para que su borde
 // superior (rugoso por el filtro) nunca asome sobre la sección anterior
 const fillDown = (pts: [number, number][], top = -40) =>
@@ -38,16 +56,16 @@ export function buildTears() {
     const r = rng(idx * 17 + 3)
     const deep = from === 'ink' ? '#f1efe8' : '#000'
 
-    const front = jag(r, TH * 0.3, 34)
-    const fiber = front.map(([x, y]) => [x, y + 3 + r() * 7] as [number, number])
-    const lime = jag(r, TH * 0.5, 40, 10, 40)
-    const back = jag(r, TH * 0.7, 30, 8, 30)
+    const front = roughen(jag(r, TH * 0.3, 34), r, 5)
+    const fiber = roughen(front.map(([x, y]) => [x, y + 3 + r() * 7] as [number, number]), r, 3)
+    const lime = roughen(jag(r, TH * 0.5, 40, 10, 40), r, 5)
+    const back = roughen(jag(r, TH * 0.7, 30, 8, 30), r, 4)
 
     // el borde se guarda para que drips.ts cuelgue las gotas de él
     ;(el as HTMLElement & { _edge?: [number, number][] })._edge = front.map(([x, y]) => [x / TW, y / TH])
 
-    const svg = (cls: string, d: string, fill: string, filter = 'url(#rough)') =>
-      `<svg class="tear__l tear__l--${cls}" viewBox="0 0 ${TW} ${TH}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="${fill}" filter="${filter}"/></svg>`
+    const svg = (cls: string, d: string, fill: string) =>
+      `<svg class="tear__l tear__l--${cls}" viewBox="0 0 ${TW} ${TH}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="${fill}"/></svg>`
 
     el.innerHTML =
       svg('back', fillDown(back, 30), deep) +
@@ -184,7 +202,7 @@ export function initSpray() {
   const c = document.createElement('canvas')
   c.className = 'spray'
   c.setAttribute('aria-hidden', 'true')
-  c.style.display = 'none'
+  c.style.visibility = 'hidden'
   document.body.appendChild(c)
   const o = c.getContext('2d')!
   let dpr = 1
@@ -255,17 +273,18 @@ export function initSpray() {
     if (!first && still > 14 && still < 50 && still % 12 === 0) {
       ps.push({ x: lx + gauss() * 10, y: ly + 4, y0: ly + 4, vy: 0.5 + Math.random() * 0.8, r: 1 + Math.random() * 1.4, life: 0, max: 100 + Math.random() * 50, drip: true, col })
     }
-    // sin partículas el canvas se saca del render: un canvas de pantalla
-    // completa, aunque esté vacío, se compone en cada frame
+    // sin partículas el canvas se oculta con visibility (no se compone) pero
+    // conserva su capa: con display:none el navegador la destruía y al volver
+    // a mover el mouse la recreaba a pantalla completa → tirón de ~100 ms
     if (!ps.length) {
       if (dirty) {
         o.clearRect(0, 0, c.width, c.height)
-        c.style.display = 'none'
+        c.style.visibility = 'hidden'
         dirty = false
       }
       return
     }
-    if (!dirty) c.style.display = ''
+    if (!dirty) c.style.visibility = ''
     dirty = true
     // borrar sólo el rectángulo donde había pintura el frame anterior, no
     // toda la pantalla (la pintura suele ocupar un área chica cerca del cursor)
@@ -348,9 +367,11 @@ export function initMeltables() {
   const NS = 'http://www.w3.org/2000/svg'
   const noise = columnNoise()
   const items = [...document.querySelectorAll<HTMLElement>('.melt')].map((el, i) => {
-    // títulos gigantes que sólo se derriten con el cursor: ruido continuo
-    // (feTurbulence). El feImage se desalinea entre los mosaicos en que el
-    // navegador pinta un elemento tan grande y lo corta en franjas.
+    // Títulos gigantes ("HABLEMOS"): ruido continuo (feTurbulence; el feImage
+    // se desalinea entre los mosaicos de pintado y lo corta en franjas) y
+    // goteo FIJO. Ya no reacciona al cursor: re-rasterizar este filtro sobre
+    // un título de pantalla completa con 18 sombras costaba ~110 ms por cambio.
+    // Sigue derritiéndose con el easter egg (nyx).
     if (el.dataset.meltScroll === 'off') {
       const f = (document.getElementById('melt') as unknown as SVGFilterElement).cloneNode(true) as SVGFilterElement
       f.id = `melt-${i}`
@@ -358,10 +379,7 @@ export function initMeltables() {
       el.style.filter = `url(#melt-${i})`
       const map = f.querySelector('feDisplacementMap')!
       map.removeAttribute('id')
-      const it = { el, map, hover: 0, target: 0, shown: -1, scroll: false }
-      el.addEventListener('pointerenter', () => (it.target = 70))
-      el.addEventListener('pointerleave', () => (it.target = 0))
-      return it
+      return { el, map, hover: 0, target: 0, shown: -1, scroll: false }
     }
     const f = document.createElementNS(NS, 'filter')
     f.id = `melt-${i}`

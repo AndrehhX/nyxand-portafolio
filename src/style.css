@@ -1051,7 +1051,7 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
 /* titulares: se inclinan con la velocidad del scroll */
 /* will-change: cada título en su propia capa → la inclinación la hace la GPU
    sin volver a pintar el texto ni su filtro */
-.yo__title, .stack__title, .trabajo__head h2, .photos__head h3 { transform: skewY(var(--skew, 0deg)); transform-origin: 0 50%; will-change: transform; }
+.yo__title, .stack__title, .trabajo__head h2, .photos__head h3 { transform-origin: 0 50%; will-change: transform; }
 .melt { cursor: crosshair; }
 
 /* párrafos palabra por palabra */

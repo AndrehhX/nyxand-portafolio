@@ -111,7 +111,17 @@ async function boot() {
 const scrollFx = { v: 0, dir: 1 }
 function initMelt() {
   const updateMelt = initMeltables()
-  const root = document.documentElement
+  // títulos que se inclinan; sólo se tocan los que están en pantalla
+  const skewed = [...document.querySelectorAll<HTMLElement>('.yo__title, .stack__title, .trabajo__head h2, .photos__head h3')]
+  const io = new IntersectionObserver((ens) => ens.forEach((en) => {
+    const el = en.target as HTMLElement
+    if (en.isIntersecting) el.dataset.vis = '1'
+    else {
+      delete el.dataset.vis
+      el.style.transform = ''
+    }
+  }))
+  skewed.forEach((h) => io.observe(h))
   let cur = 0
   let target = 0
   let lastY = scrollY
@@ -136,11 +146,14 @@ function initMelt() {
       updateMelt(lite ? 0 : cur)
     }
     skew += (Math.max(-7, Math.min(7, scrollFx.v * 0.12)) - skew) * 0.15
-    // tocar una var en :root recalcula estilos de todo: sólo si cambió
+    // La inclinación va DIRECTO en los títulos visibles. Antes era una variable
+    // CSS en :root, y como las variables se heredan, cambiarla en cada frame
+    // de scroll recalculaba estilos de TODA la página (la mitad del tiempo de
+    // CPU se iba ahí). Con transform en 4 elementos lo resuelve la GPU.
     const s = Math.abs(skew) < 0.02 ? '0' : skew.toFixed(2)
     if (s !== lastSkew) {
       lastSkew = s
-      root.style.setProperty('--skew', `${s}deg`)
+      for (const h of skewed) if (h.dataset.vis) h.style.transform = s === '0' ? '' : `skewY(${s}deg)`
     }
   })
 }
