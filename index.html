@@ -19,6 +19,17 @@
       </filter>
     </svg>
 
+    <div class="intro" aria-hidden="true">
+      <div class="intro__log">
+        <span>&gt; montando cromo ............ ok</span>
+        <span>&gt; cargando tinta ............ ok</span>
+        <span>&gt; quitando plantillas ....... ok</span>
+        <span>&gt; nyxand v2 — guatemala</span>
+      </div>
+      <div class="intro__count"><span data-count>000</span><small>%</small></div>
+      <div class="intro__bar"><i></i></div>
+    </div>
+
     <div class="grain" aria-hidden="true"></div>
     <div class="cursor" aria-hidden="true"><span class="cursor__label"></span></div>
 
@@ -45,6 +56,18 @@
         <div class="corner corner--bl"><span class="blink">■</span> MANTÉN PRESIONADO<br />PARA DERRETIR</div>
         <div class="corner corner--br">VOL. 02 — 2026<br />SIGUE BAJANDO ↓</div>
         <div class="hero__status">● DISPONIBLE PARA PROYECTOS</div>
+
+        <div class="stickers" aria-hidden="true">
+          <div class="sticker sticker--name" data-drag style="--x: 50%; --y: 74%; --r: -4deg">
+            ANDREH CALLEJAS<small>DESARROLLADOR · GUATEMALA</small>
+          </div>
+          <div class="sticker sticker--round" data-drag style="--x: 84%; --y: 26%; --r: 14deg">
+            <span class="goth">sin</span>PLANTI&shy;LLAS
+          </div>
+          <div class="sticker sticker--ink" data-drag style="--x: 13%; --y: 30%; --r: -10deg">
+            HECHO A MANO<b>EN GT</b>
+          </div>
+        </div>
       </section>
 
       <div class="tear" data-from="ink" data-to="paper"></div>
@@ -85,9 +108,47 @@
             <li><span class="facts__n">-06</span><span class="facts__l">GMT, Guatemala<br />remoto a todo el mundo</span></li>
           </ul>
         </div>
+
+        <div class="photos" data-cursor="arrastrar">
+          <header class="photos__head">
+            <h3 data-reveal><span class="line">FUERA DEL <span class="goth">código</span></span></h3>
+            <span class="label">[ ROLLO PERSONAL — 05 FOTOS — ARRASTRA ↔ ]</span>
+          </header>
+          <div class="photos__track">
+            <figure class="print" style="--r: -3deg">
+              <img src="/media/tono-andreh.webp" alt="Andreh recargado en una pared de mármol con un sticker que le tapa la cara" draggable="false" />
+              <figcaption><b>01</b><span class="goth">el de la foto</span><em>sin cara, con chamarra</em></figcaption>
+            </figure>
+            <figure class="print" style="--r: 2.5deg">
+              <img src="/media/tono-cafe.webp" alt="Taza y jarra de café de especialidad sobre una mesa" draggable="false" />
+              <figcaption><b>02</b><span class="goth">combustible</span><em>café de especialidad</em></figcaption>
+            </figure>
+            <figure class="print" style="--r: -1.5deg">
+              <img src="/media/tono-circuitos.webp" alt="Protoboard con cables y circuitos frente a una laptop" draggable="false" />
+              <figcaption><b>03</b><span class="goth">a mano</span><em>circuitos y protoboard</em></figcaption>
+            </figure>
+            <figure class="print" style="--r: 3.5deg">
+              <img src="/media/tono-codigo.webp" alt="Código en pantalla y apuntes de C escritos a mano" draggable="false" />
+              <figcaption><b>04</b><span class="goth">cuaderno</span><em>primero en papel, luego en C</em></figcaption>
+            </figure>
+            <figure class="print" style="--r: -2.5deg">
+              <img src="/media/tono-laboratorio.webp" alt="Laboratorio de computación con monitores y audífonos" draggable="false" />
+              <figcaption><b>05</b><span class="goth">laboratorio</span><em>donde pasan las horas</em></figcaption>
+            </figure>
+          </div>
+        </div>
       </section>
 
       <div class="tear" data-from="paper" data-to="ink"></div>
+
+      <div class="caution" aria-hidden="true">
+        <div class="caution__tape caution__tape--a"><div class="caution__run">
+          <span>NO TEMPLATES ✦ CÓDIGO PROPIO ✦ NYXAND ✦ HECHO EN GUATEMALA ✦ </span><span>NO TEMPLATES ✦ CÓDIGO PROPIO ✦ NYXAND ✦ HECHO EN GUATEMALA ✦ </span>
+        </div></div>
+        <div class="caution__tape caution__tape--b"><div class="caution__run">
+          <span>PRECAUCIÓN: TRABAJO REAL ADELANTE ✦ PRECAUCIÓN: TRABAJO REAL ADELANTE ✦ </span><span>PRECAUCIÓN: TRABAJO REAL ADELANTE ✦ PRECAUCIÓN: TRABAJO REAL ADELANTE ✦ </span>
+        </div></div>
+      </div>
 
       <!-- ============ TRABAJO ============ -->
       <section class="trabajo" id="trabajo">
@@ -171,6 +232,7 @@
           <button class="case__close" data-close data-cursor="cerrar">[ CERRAR ✕ ]</button>
         </div>
         <canvas class="case__shot"></canvas>
+        <img class="case__img" alt="" hidden />
         <div class="case__num"></div>
         <h3 class="case__title" id="case-title"></h3>
         <p class="case__lead"></p>

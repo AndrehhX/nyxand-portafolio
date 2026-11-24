@@ -7,6 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { buildFilm, initCase } from './film'
 import { mountSigils } from './sigil'
+import { initPhotos, initStickers, slapStickers } from './interact'
 import { buildTapes, buildTears, fitText, initClock, initCursor, initGrain, splitChars } from './fx'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -38,14 +39,55 @@ splitChars()
 initCase(lenis)
 buildTapes()
 
-// three.js + opentype van en un chunk aparte para que el resto cargue primero
-import('./hero3d')
-  .then(({ initHero3D }) => initHero3D(document.getElementById('hero-gl') as HTMLCanvasElement, reduce))
-  .then((ok) => document.documentElement.classList.toggle('no-gl', !ok))
-  .catch((err) => {
-    console.error(err)
-    document.documentElement.classList.add('no-gl')
+initStickers()
+initPhotos(reduce)
+runIntro()
+
+// Intro: contador mientras carga el 3D → cortina → las letras caen → stickers
+async function runIntro() {
+  const intro = document.querySelector<HTMLElement>('.intro')!
+  const num = intro.querySelector<HTMLElement>('[data-count]')!
+  const bar = intro.querySelector<HTMLElement>('.intro__bar i')!
+  lenis?.stop()
+  const counter = { v: 0 }
+  const counting = reduce
+    ? Promise.resolve()
+    : new Promise<void>((res) =>
+        gsap.to(counter, {
+          v: 100,
+          duration: 1.6,
+          ease: 'power2.inOut',
+          onUpdate: () => {
+            num.textContent = String(Math.round(counter.v)).padStart(3, '0')
+            bar.style.transform = `scaleX(${counter.v / 100})`
+          },
+          onComplete: res,
+        }),
+      )
+  if (!reduce) gsap.from('.intro__log span', { opacity: 0, x: -10, stagger: 0.25, duration: 0.2 })
+
+  // three.js + opentype van en un chunk aparte para que el resto cargue primero
+  const heroP = import('./hero3d')
+    .then(({ initHero3D }) => initHero3D(document.getElementById('hero-gl') as HTMLCanvasElement, reduce))
+    .catch((err) => {
+      console.error(err)
+      return null
+    })
+  const [hero] = await Promise.all([heroP, counting])
+  document.documentElement.classList.toggle('no-gl', !hero)
+
+  await gsap.to(intro, {
+    clipPath: 'inset(0 0 100% 0)',
+    duration: reduce ? 0 : 0.7,
+    ease: 'expo.inOut',
   })
+  intro.remove()
+  lenis?.start()
+
+  if (hero) await hero.drop()
+  slapStickers()
+  gsap.from('.corner, .hero__status', { opacity: 0, y: 12, stagger: 0.06, duration: 0.5 })
+}
 
 document.fonts.ready.then(() => {
   fitText()
@@ -64,7 +106,15 @@ addEventListener('resize', () => {
 })
 
 function animate() {
-  gsap.from('.corner, .hero__status', { opacity: 0, y: 12, stagger: 0.08, delay: 0.8, duration: 0.6 })
+  // (el transform de .print lo maneja el carrusel; aquí sólo translate/opacity)
+  gsap.from('.print', {
+    translate: '0px 180px',
+    opacity: 0,
+    stagger: 0.08,
+    duration: 1.1,
+    ease: 'expo.out',
+    scrollTrigger: { trigger: '.photos', start: 'top 85%' },
+  })
 
   // Titulares: cada línea cae como una placa en 3D
   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {

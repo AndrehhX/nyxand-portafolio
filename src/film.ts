@@ -70,7 +70,7 @@ export function buildFilm() {
     <article class="frame">
       <div class="frame__edge"><span>NYX 100 PROFESSIONAL</span><span>▸ ${p.id}A</span></div>
       <button class="frame__shot" data-open="${i}" data-cursor="abrir caso" aria-label="Abrir caso ${p.name}">
-        <canvas></canvas>
+        ${p.img ? `<img src="${p.img}" alt="Captura de ${p.name}" loading="lazy" draggable="false" />` : '<canvas></canvas>'}
         <span class="frame__num">${p.id}</span>
         <span class="frame__status">${p.status.toUpperCase()}</span>
       </button>
@@ -94,7 +94,10 @@ export function buildFilm() {
       <div class="frame__meta"><h3>TU PROYECTO</h3><p>Todavía sin revelar.</p></div>
     </article>`
 
-  track.querySelectorAll<HTMLCanvasElement>('.frame__shot canvas').forEach((c, i) => drawPoster(c, projects[i]))
+  track.querySelectorAll<HTMLButtonElement>('.frame__shot[data-open]').forEach((b) => {
+    const c = b.querySelector('canvas')
+    if (c) drawPoster(c, projects[Number(b.dataset.open)])
+  })
 }
 
 export function initCase(lenis: Lenis | null) {
@@ -116,7 +119,14 @@ export function initCase(lenis: Lenis | null) {
           .map((l) => `<a href="${l.href}" target="_blank" rel="noopener" data-cursor="abrir">${l.label} ↗</a>`)
           .join('')
       : '<span class="case__soon">Links cuando salga del horno.</span>'
-    drawPoster(q<HTMLCanvasElement>('.case__shot'), p, 220, 120)
+    const shot = q<HTMLCanvasElement>('.case__shot')
+    const photo = q<HTMLImageElement>('.case__img')
+    shot.hidden = !!p.img
+    photo.hidden = !p.img
+    if (p.img) {
+      photo.src = p.img
+      photo.alt = `Captura de ${p.name}`
+    } else drawPoster(shot, p, 220, 120)
 
     lastFocus = document.activeElement as HTMLElement
     root.classList.add('is-open')

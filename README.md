@@ -6,6 +6,9 @@ La dirección visual mezcla lo hecho a mano (tinta, brocha, papel rasgado, garab
 ## Características
 
 - **Hero WebGL**: "NyxAnd" en blackletter 3D extruido de cromo, con piercings, pasado por un shader de dithering 1-bit. El cursor abre una lente que revela el cromo real, mantener presionado derrite las letras y el scroll las desintegra en píxeles.
+- **Intro**: contador en pixel-gótico mientras carga el 3D; luego las letras caen con impacto (temblor de cámara y flash) y se pegan stickers arrastrables.
+- **Foto real tramada** a 1-bit como fondo del hero, y carrusel "Fuera del código" con fotos estilo fotocopia, arrastre con inercia e inclinación 3D.
+- **Capturas reales** de Orunei y Kaze en el carrete (se revelan a color al pasar el cursor).
 - **Sigilos procedurales** (estilo cyber-sigilism) generados con curvas bezier y espinas.
 - **Animaciones 3D**: titulares que caen como placas, carrete de proyectos en cilindro 3D y "HABLEMOS" con extrusión que sigue al cursor.
 - **Transiciones de tinta rasgada** entre secciones, generadas como SVG con chorreados y filtros de turbulencia.
@@ -48,6 +51,7 @@ El build es estático: se puede desplegar en Vercel, Netlify o cualquier hosting
     ├── main.ts         # Arranque, Lenis y animaciones de scroll
     ├── hero3d.ts       # Hero WebGL: texto 3D de cromo + shader de dithering
     ├── sigil.ts        # Generador procedural de sigilos
+    ├── interact.ts     # Stickers arrastrables y carrusel de fotos
     ├── film.ts         # Carrete de proyectos, pósters 1-bit y panel de caso
     ├── projects.ts     # Datos de los proyectos
     ├── fx.ts           # Rasgados, cintas, cursor, grano, reloj y utilidades
@@ -56,7 +60,8 @@ El build es estático: se puede desplegar en Vercel, Netlify o cualquier hosting
 
 ## Mantenimiento
 
-- **Añadir o editar proyectos**: modificar `src/projects.ts`. El carrete y el panel se generan solos.
+- **Añadir o editar proyectos**: modificar `src/projects.ts`. El carrete y el panel se generan solos; con `img` se usa una captura de `public/media`, sin ella se genera un póster 1-bit.
+- **Fotos**: en `public/media`; el carrusel está en `index.html` (sección `.photos`) y la foto del hero en `PHOTO` de `src/hero3d.ts`.
 - **Cambiar colores**: tokens en `:root` dentro de `src/style.css` (`--ink`, `--paper`, `--lime`).
 - **Tecnologías del stack**: arreglo `TECHS` en `src/fx.ts`.
 

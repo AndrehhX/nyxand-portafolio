@@ -7,6 +7,8 @@ export type Project = {
   stack: string[]
   status: string
   glyph: string
+  /** captura real (en /public/media). Sin ella se genera un póster 1-bit. */
+  img?: string
   links: { label: string; href: string }[]
   seed: number
 }
@@ -22,6 +24,7 @@ export const projects: Project[] = [
     stack: ['React', 'Supabase', 'AniList API'],
     status: 'En línea',
     glyph: 'O',
+    img: '/media/orunei.webp',
     links: [
       { label: 'Abrir demo', href: 'https://orunei.fun/' },
       { label: 'Ver código', href: 'https://github.com/AndrehhX/orunei' },
@@ -37,6 +40,7 @@ export const projects: Project[] = [
     stack: ['Next.js', 'TypeScript', 'Supabase', 'Kotlin'],
     status: 'En línea',
     glyph: '風',
+    img: '/media/kaze.webp',
     links: [
       { label: 'Abrir demo', href: 'https://orunei-v2.vercel.app/' },
       { label: 'Ver código', href: 'https://github.com/AndrehhX/Kaze' },
