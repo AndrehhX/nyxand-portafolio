@@ -5,26 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>NYXAND — Andreh Callejas</title>
     <meta name="description" content="Portafolio de Andreh Callejas (NyxAnd): código, interfaces y automatización desde Guatemala." />
-    <meta name="theme-color" content="#0b0b0a" />
+    <meta name="theme-color" content="#060606" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;700&family=Knewave&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <!-- Filtros de tinta: bordes crudos para brochazos y rasgados -->
     <svg class="defs" aria-hidden="true" width="0" height="0">
       <filter id="rough" x="-10%" y="-10%" width="120%" height="120%">
         <feTurbulence type="fractalNoise" baseFrequency="0.05" numOctaves="3" seed="4" />
         <feDisplacementMap in="SourceGraphic" scale="8" xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-      <filter id="rough-heavy" x="-10%" y="-20%" width="120%" height="140%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.035" numOctaves="4" seed="9" />
-        <feDisplacementMap in="SourceGraphic" scale="18" xChannelSelector="R" yChannelSelector="G" />
-      </filter>
-      <filter id="rough-soft" x="-5%" y="-5%" width="110%" height="110%">
-        <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="2" seed="2" />
-        <feDisplacementMap in="SourceGraphic" scale="3" xChannelSelector="R" yChannelSelector="G" />
       </filter>
     </svg>
 
@@ -46,20 +37,13 @@
     <main id="top">
       <!-- ============ HERO ============ -->
       <section class="hero" id="hero">
-        <canvas class="hero__pixels" id="pixels" aria-hidden="true"></canvas>
-        <h1 class="sr-only">NyxAnd — Andreh Callejas, desarrollador de software en Guatemala</h1>
+        <canvas class="hero__gl" id="hero-gl" data-cursor="mantén = derretir" aria-hidden="true"></canvas>
+        <h1 class="hero__fallback">NyxAnd <small>Andreh Callejas — desarrollador</small></h1>
 
-        <div class="hero__tag" aria-hidden="true">
-          <svg class="hero__band" viewBox="0 0 600 150" preserveAspectRatio="none">
-            <path d="M14 46 C 120 20, 300 34, 588 12 L 594 70 C 570 104, 420 118, 300 126 C 190 134, 90 140, 6 132 C 18 104, 0 76, 14 46 Z" />
-          </svg>
-          <span class="hero__brush">Andreh.</span>
-        </div>
-
-        <div class="corner corner--tl">[ PORTAFOLIO ]<br />VOL. 02 — 2026</div>
+        <div class="corner corner--tl">[ ANDREH CALLEJAS ]<br />CÓDIGO · INTERFACES · AUTOMATIZACIÓN</div>
         <div class="corner corner--tr">GUATEMALA<br />14.63°N 90.51°W</div>
-        <div class="corner corner--bl">CÓDIGO / INTERFACES /<br />AUTOMATIZACIÓN</div>
-        <div class="corner corner--br"><span class="blink">■</span> SIGUE BAJANDO ↓</div>
+        <div class="corner corner--bl"><span class="blink">■</span> MANTÉN PRESIONADO<br />PARA DERRETIR</div>
+        <div class="corner corner--br">VOL. 02 — 2026<br />SIGUE BAJANDO ↓</div>
         <div class="hero__status">● DISPONIBLE PARA PROYECTOS</div>
       </section>
 
@@ -67,25 +51,24 @@
 
       <!-- ============ YO ============ -->
       <section class="yo paper" id="yo">
+        <svg class="sigil sigil--yo" data-sigil="7" data-strokes="5"></svg>
         <div class="label">[ 01 — SOBRE MÍ ]</div>
         <h2 class="yo__title" data-reveal>
           <span class="line">ESCRIBO CÓDIGO</span>
-          <span class="line">COMO QUIEN RAYA</span>
+          <span class="line"><span class="goth stamp">como quien</span> RAYA</span>
           <span class="line">UN <span class="scribble">CUADERNO<svg viewBox="0 0 200 80" preserveAspectRatio="none" aria-hidden="true"><path data-draw d="M18 46 C 12 14, 120 4, 186 22 C 214 32, 190 70, 110 74 C 40 78, 4 60, 10 38 C 16 20, 70 10, 130 12" /></svg></span>.</span>
         </h2>
 
         <div class="yo__grid">
           <figure class="doodle" aria-hidden="true">
             <svg viewBox="0 0 260 220">
-              <g class="doodle__guy">
-                <circle data-draw cx="80" cy="56" r="26" />
-                <path data-draw d="M70 52 L70 54 M90 52 L90 54" />
-                <path data-draw d="M68 66 C 74 74, 86 74, 92 66" />
-                <path data-draw d="M80 82 L80 148" />
-                <path data-draw d="M80 100 L118 122 M80 100 L122 112" />
-                <path data-draw d="M80 148 L60 196 M80 148 L104 194" />
-                <path data-draw d="M112 128 L178 128 L190 96 L126 96 Z" />
-              </g>
+              <circle data-draw cx="80" cy="56" r="26" />
+              <path data-draw d="M70 52 L70 54 M90 52 L90 54" />
+              <path data-draw d="M68 66 C 74 74, 86 74, 92 66" />
+              <path data-draw d="M80 82 L80 148" />
+              <path data-draw d="M80 100 L118 122 M80 100 L122 112" />
+              <path data-draw d="M80 148 L60 196 M80 148 L104 194" />
+              <path data-draw d="M112 128 L178 128 L190 96 L126 96 Z" />
               <path class="doodle__arrow" data-draw d="M236 20 C 220 50, 200 60, 170 66 M182 56 L170 66 L184 74" />
             </svg>
             <figcaption>yo, debuggeando<br />a las 3am</figcaption>
@@ -99,7 +82,7 @@
           <ul class="facts">
             <li><span class="facts__n">05</span><span class="facts__l">proyectos<br />en el carrete</span></li>
             <li><span class="facts__n">03</span><span class="facts__l">plataformas<br />web · desktop · android</span></li>
-            <li><span class="facts__n">GMT-6</span><span class="facts__l">zona horaria<br />remoto a todo el mundo</span></li>
+            <li><span class="facts__n">-06</span><span class="facts__l">GMT, Guatemala<br />remoto a todo el mundo</span></li>
           </ul>
         </div>
       </section>
@@ -113,9 +96,9 @@
           <header class="trabajo__head">
             <div>
               <div class="label">[ 02 — TRABAJO SELECCIONADO ]</div>
-              <h2>05 FOTOGRAMAS<br /><span class="outline">DE CÓDIGO.</span></h2>
+              <h2 data-reveal><span class="line">05 FOTOGRAMAS</span><span class="line"><span class="goth">de código.</span></span></h2>
             </div>
-            <p class="trabajo__hint">Scrollea para correr el carrete.<br />Click en un cuadro para abrir el caso →</p>
+            <p class="trabajo__hint">Scrollea para girar el carrete.<br />Click en un cuadro para abrir el caso →</p>
           </header>
           <div class="film">
             <div class="film__track" id="film"></div>
@@ -130,8 +113,8 @@
         <div class="label">[ 03 — STACK / RECORRIDO ]</div>
         <h2 class="stack__title" data-reveal>
           <span class="line">HERRAMIENTAS</span>
-          <span class="line">QUE <span class="hl">USO</span> SIN</span>
-          <span class="line">MIEDO.</span>
+          <span class="line">QUE USO SIN</span>
+          <span class="line"><span class="goth stamp">miedo.</span></span>
         </h2>
         <p class="stack__note">← arrástralas, no muerden</p>
         <div class="tapes" id="tapes"></div>
@@ -141,9 +124,12 @@
 
       <!-- ============ HABLEMOS ============ -->
       <section class="hablemos" id="hablemos">
+        <svg class="sigil sigil--hablemos" data-sigil="21" data-strokes="6"></svg>
         <div class="label">[ 04 — HABLEMOS ]</div>
-        <p class="hablemos__crazy">¿Tienes una<br />idea loca?</p>
-        <h2 class="hablemos__big" data-fit data-chars>HABLEMOS</h2>
+        <p class="hablemos__crazy goth">¿tienes una<br />idea loca?</p>
+        <div class="hablemos__stage">
+          <h2 class="hablemos__big" data-fit data-chars>HABLEMOS</h2>
+        </div>
 
         <div class="hablemos__row">
           <a class="hablemos__mail" href="mailto:andrehcallex@gmail.com" data-cursor="escribir">
@@ -161,10 +147,10 @@
 
         <div class="marquee" aria-hidden="true">
           <div class="marquee__inner">
-            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> NYXAND <i>✦</i> </span>
-            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> NYXAND <i>✦</i> </span>
-            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> NYXAND <i>✦</i> </span>
-            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> NYXAND <i>✦</i> </span>
+            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
+            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
+            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
+            <span>DISPONIBLE PARA PROYECTOS <i>✦</i> <b>NyxAnd</b> <i>✦</i> </span>
           </div>
         </div>
 

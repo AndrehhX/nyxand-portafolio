@@ -5,9 +5,11 @@ La dirección visual mezcla lo hecho a mano (tinta, brocha, papel rasgado, garab
 
 ## Características
 
-- **Hero en píxeles**: "NYXAND" renderizado en una rejilla con dithering Bayer, que se dispersa con el cursor o el dedo y hace glitch por su cuenta.
+- **Hero WebGL**: "NyxAnd" en blackletter 3D extruido de cromo, con piercings, pasado por un shader de dithering 1-bit. El cursor abre una lente que revela el cromo real, mantener presionado derrite las letras y el scroll las desintegra en píxeles.
+- **Sigilos procedurales** (estilo cyber-sigilism) generados con curvas bezier y espinas.
+- **Animaciones 3D**: titulares que caen como placas, carrete de proyectos en cilindro 3D y "HABLEMOS" con extrusión que sigue al cursor.
 - **Transiciones de tinta rasgada** entre secciones, generadas como SVG con chorreados y filtros de turbulencia.
-- **Carrete de película**: los proyectos son fotogramas que se recorren en horizontal con el scroll (en móvil pasan a lista vertical). Las "fotos" son pósters 1-bit generados en canvas, sin imágenes externas.
+- **Carrete de película**: los proyectos son fotogramas en un cilindro que gira con el scroll (en móvil pasan a lista). Las "fotos" son pósters 1-bit generados en canvas, sin imágenes externas.
 - **Panel de caso** por proyecto con stack, estado y enlaces (se cierra con Esc).
 - **Stack en cintas arrastrables**.
 - **Detalles**: cursor con etiqueta, grano de película, reloj en hora de Guatemala, scroll suave y animaciones de scroll.
@@ -18,7 +20,8 @@ La dirección visual mezcla lo hecho a mano (tinta, brocha, papel rasgado, garab
 - [Vite](https://vite.dev) + TypeScript (sin framework)
 - [GSAP](https://gsap.com) + ScrollTrigger
 - [Lenis](https://lenis.darkroom.engineering) (scroll suave)
-- Tipografías de Google Fonts: Anton, JetBrains Mono, Knewave
+- [three.js](https://threejs.org) + [opentype.js](https://opentype.js.org) (texto 3D desde la fuente)
+- Tipografías: Anton, JetBrains Mono (Google Fonts), Grenze Gotisch y Jacquard 24 (Fontsource)
 
 ## Instalación
 
@@ -43,7 +46,8 @@ El build es estático: se puede desplegar en Vercel, Netlify o cualquier hosting
 ├── public/favicon.svg
 └── src/
     ├── main.ts         # Arranque, Lenis y animaciones de scroll
-    ├── pixelHero.ts    # Hero de píxeles con dithering e interacción
+    ├── hero3d.ts       # Hero WebGL: texto 3D de cromo + shader de dithering
+    ├── sigil.ts        # Generador procedural de sigilos
     ├── film.ts         # Carrete de proyectos, pósters 1-bit y panel de caso
     ├── projects.ts     # Datos de los proyectos
     ├── fx.ts           # Rasgados, cintas, cursor, grano, reloj y utilidades
