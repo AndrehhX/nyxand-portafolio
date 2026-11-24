@@ -185,6 +185,125 @@ export function fitText() {
   })
 }
 
+// Cursor de aerosol: el puntero va soltando pintura (lima sobre negro,
+// tinta sobre papel). Si te quedas quieto un momento, la pintura chorrea.
+export function initSpray() {
+  if (!matchMedia('(pointer: fine)').matches) return
+  const c = document.createElement('canvas')
+  c.className = 'spray'
+  c.setAttribute('aria-hidden', 'true')
+  document.body.appendChild(c)
+  const o = c.getContext('2d')!
+  let dpr = 1
+  const size = () => {
+    dpr = Math.min(devicePixelRatio || 1, 2)
+    c.width = innerWidth * dpr
+    c.height = innerHeight * dpr
+    o.setTransform(dpr, 0, 0, dpr, 0, 0)
+  }
+  size()
+  addEventListener('resize', size)
+
+  type P = { x: number; y: number; y0: number; vy: number; r: number; life: number; max: number; drip: boolean; col: string }
+  const ps: P[] = []
+  let lx = 0
+  let ly = 0
+  let first = true
+  let col = '#c8f31d'
+  let still = 0
+  const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5
+
+  addEventListener('pointermove', (e) => {
+    if (first) {
+      lx = e.clientX
+      ly = e.clientY
+      first = false
+      return
+    }
+    const sp = Math.min(1, Math.hypot(e.clientX - lx, e.clientY - ly) / 50)
+    lx = e.clientX
+    ly = e.clientY
+    still = 0
+    const el = document.elementFromPoint(lx, ly)
+    if (el?.closest('.case, .hud, a, button')) return
+    col = el?.closest('.paper') ? '#0b0b0a' : '#c8f31d'
+    const n = 4 + Math.round(sp * 14)
+    const spread = 5 + sp * 22
+    for (let i = 0; i < n; i++) {
+      ps.push({
+        x: lx + gauss() * spread,
+        y: ly + gauss() * spread,
+        y0: 0, vy: 0,
+        r: 0.9 + Math.random() * (2 + sp * 1.6),
+        life: 0,
+        max: 40 + Math.random() * 50,
+        drip: false,
+        col,
+      })
+    }
+    if (ps.length > 900) ps.splice(0, ps.length - 900)
+  })
+
+  gsap.ticker.add(() => {
+    // quieto = la pintura se acumula y chorrea
+    still++
+    if (!first && still > 14 && still < 50 && still % 12 === 0) {
+      ps.push({ x: lx + gauss() * 10, y: ly + 4, y0: ly + 4, vy: 0.5 + Math.random() * 0.8, r: 1 + Math.random() * 1.4, life: 0, max: 100 + Math.random() * 50, drip: true, col })
+    }
+    o.clearRect(0, 0, c.width, c.height)
+    for (let i = ps.length - 1; i >= 0; i--) {
+      const p = ps[i]
+      p.life++
+      if (p.life > p.max) {
+        ps.splice(i, 1)
+        continue
+      }
+      const a = 1 - (p.life / p.max) ** 2
+      o.globalAlpha = a
+      o.fillStyle = p.col
+      if (p.drip) {
+        p.y += p.vy
+        p.vy *= 0.985
+        o.fillRect(p.x - p.r * 0.5, p.y0, p.r, p.y - p.y0)
+        o.beginPath()
+        o.arc(p.x, p.y, p.r * 0.9, 0, Math.PI * 2)
+        o.fill()
+      } else {
+        o.fillRect(p.x, p.y, p.r, p.r)
+      }
+    }
+    o.globalAlpha = 1
+  })
+}
+
+// Cada titular .melt tiene su propio filtro: se derrite con la velocidad
+// del scroll (global) y además al pasarle el cursor encima.
+export function initMeltables() {
+  const src = document.getElementById('melt')!
+  const items = [...document.querySelectorAll<HTMLElement>('.melt')].map((el, i) => {
+    const f = src.cloneNode(true) as SVGFilterElement
+    f.id = `melt-${i}`
+    f.querySelector('feTurbulence')!.setAttribute('seed', String(3 + i * 7))
+    src.parentNode!.appendChild(f)
+    el.style.filter = `url(#melt-${i})`
+    const map = f.querySelector('feDisplacementMap')!
+    const it = { el, map, hover: 0, target: 0, shown: -1 }
+    el.addEventListener('pointerenter', () => (it.target = 70))
+    el.addEventListener('pointerleave', () => (it.target = 0))
+    return it
+  })
+  return (velocity: number) => {
+    items.forEach((it) => {
+      it.hover += (it.target - it.hover) * (it.target ? 0.05 : 0.08)
+      const s = Math.round(10 + velocity + it.hover)
+      if (s !== it.shown) {
+        it.shown = s
+        it.map.setAttribute('scale', String(s))
+      }
+    })
+  }
+}
+
 // Texto que se "decodifica" con glifos de ruido antes de asentarse
 const NOISE = '▓▒░#/\\_01<>*'
 const scrambling = new WeakMap<HTMLElement, number>()
@@ -200,6 +319,56 @@ export function scramble(el: HTMLElement, text: string, ms = 420) {
     if (p < 1) scrambling.set(el, requestAnimationFrame(tick))
   }
   tick()
+}
+
+// Scramble que respeta el marcado (<br>, <span>…): anima cada nodo de texto
+export function scrambleIn(el: HTMLElement, ms = 600) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+  const nodes: { n: Text; t: string }[] = []
+  while (walker.nextNode()) {
+    const n = walker.currentNode as Text
+    if (n.nodeValue && n.nodeValue.trim()) nodes.push({ n, t: n.nodeValue })
+  }
+  if (!nodes.length) return
+  const key = el as HTMLElement & { _scr?: number }
+  cancelAnimationFrame(key._scr ?? 0)
+  const t0 = performance.now()
+  const tick = () => {
+    const p = Math.min(1, (performance.now() - t0) / ms)
+    nodes.forEach(({ n, t }) => {
+      const fixed = Math.floor(t.length * p)
+      n.nodeValue = t.slice(0, fixed) + [...t.slice(fixed)].map((c) => (/\s/.test(c) ? c : NOISE[(Math.random() * NOISE.length) | 0])).join('')
+    })
+    if (p < 1) key._scr = requestAnimationFrame(tick)
+  }
+  tick()
+}
+
+// Parte un párrafo en palabras enmascaradas para revelarlas una por una
+export function splitWords(el: HTMLElement) {
+  const walk = (node: Node) => {
+    ;[...node.childNodes].forEach((ch) => {
+      if (ch.nodeType === 3) {
+        const frag = document.createDocumentFragment()
+        ch.nodeValue!.split(/(\s+)/).forEach((w) => {
+          if (!w) return
+          if (/^\s+$/.test(w)) frag.appendChild(document.createTextNode(w))
+          else {
+            const o = document.createElement('span')
+            o.className = 'w'
+            const i = document.createElement('span')
+            i.className = 'w__i'
+            i.textContent = w
+            o.appendChild(i)
+            frag.appendChild(o)
+          }
+        })
+        ch.replaceWith(frag)
+      } else if (ch.nodeType === 1 && (ch as Element).tagName !== 'BR') walk(ch)
+    })
+  }
+  walk(el)
+  return el.querySelectorAll<HTMLElement>('.w__i')
 }
 
 export function splitChars() {

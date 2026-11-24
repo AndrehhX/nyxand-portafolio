@@ -8,7 +8,10 @@ import Lenis from 'lenis'
 import { buildFilm, initCase } from './film'
 import { mountSigils } from './sigil'
 import { initPhotos } from './interact'
-import { buildTapes, buildTears, fitText, initClock, initCursor, initGrain, scramble } from './fx'
+import {
+  buildTapes, buildTears, fitText, initClock, initCursor, initGrain, initMeltables, initSpray,
+  scramble, scrambleIn, splitWords,
+} from './fx'
 
 gsap.registerPlugin(ScrollTrigger)
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -37,33 +40,39 @@ mountSigils()
 initCursor()
 initCase(lenis)
 buildTapes()
-if (!reduce) initMelt()
+if (!reduce) {
+  initMelt()
+  initSpray()
+}
 runIntro()
 
 // ---------------------------------------------------------------
 // Derretido global: los titulares chorrean más entre más rápido se
 // hace scroll, y el reflejo del cromo corre con la página.
+// La velocidad del scroll también inclina los titulares y acelera/voltea
+// la marquesina.
+const scrollFx = { v: 0, dir: 1 }
 function initMelt() {
-  const map = document.getElementById('melt-map')!
+  const updateMelt = initMeltables()
   const root = document.documentElement
   let cur = 0
   let target = 0
   let lastY = scrollY
+  let skew = 0
   addEventListener('scroll', () => {
     const v = scrollY - lastY
     lastY = scrollY
     target = Math.min(110, Math.abs(v) * 3.2)
+    if (v) scrollFx.dir = v > 0 ? 1 : -1
+    scrollFx.v = v
   }, { passive: true })
-  let shown = -1
   gsap.ticker.add(() => {
     cur += (target - cur) * 0.12
     target *= 0.9
-    const s = Math.round(10 + cur)
-    if (s !== shown) {
-      shown = s
-      map.setAttribute('scale', String(s))
-    }
-    root.style.setProperty('--shine', `${((scrollY * 0.04) % 100).toFixed(1)}%`)
+    scrollFx.v *= 0.9
+    updateMelt(cur)
+    skew += (Math.max(-7, Math.min(7, scrollFx.v * 0.12)) - skew) * 0.15
+    root.style.setProperty('--skew', `${skew.toFixed(2)}deg`)
   })
 }
 
@@ -107,7 +116,12 @@ async function runIntro() {
 
   if (hero) await hero.drop()
   sprayTag()
-  gsap.from('.corner, .hero__status', { opacity: 0, y: 12, stagger: 0.06, duration: 0.5 })
+  if (!reduce) {
+    document.querySelectorAll<HTMLElement>('.hero .corner, .hud__nav a, .hud__time').forEach((el, i) =>
+      gsap.delayedCall(i * 0.08, () => scrambleIn(el, 700)),
+    )
+    gsap.from('.hero__status', { clipPath: 'inset(0 100% 0 0)', duration: 0.6, ease: 'steps(8)', delay: 0.4 })
+  }
   initPhotoReel()
 }
 
@@ -119,7 +133,8 @@ function sprayTag() {
   gsap.timeline()
     .fromTo(name, { clipPath: 'inset(-20% 100% -60% 0)' }, { clipPath: 'inset(-20% 0% -60% 0)', duration: 0.9, ease: 'power2.inOut' })
     .to(drip, { s: 34, duration: 2.4, ease: 'power2.out', onUpdate: () => map.setAttribute('scale', drip.s.toFixed(1)) }, 0.5)
-    .from('.tag__meta', { opacity: 0, x: -20, duration: 0.4 }, 0.7)
+    .fromTo('.tag__meta', { clipPath: 'inset(0 100% 0 0)' }, { clipPath: 'inset(0 0% 0 0)', duration: 0.5, ease: 'steps(12)' }, 0.7)
+    .call(() => scrambleIn(document.querySelector('.tag__meta')!, 800), [], 0.7)
 }
 
 // Carrusel de fotos WebGL (fallback: tira DOM con inercia)
@@ -171,29 +186,97 @@ function animate() {
     gsap.fromTo(el.querySelector('.tear__l--drips'), { scaleY: 0.35 }, { scaleY: 1.25, ease: 'none', scrollTrigger: st })
   })
 
-  // Titulares: cada línea cae como una placa en 3D
+  // Titulares: cada línea se pinta con aerosol (barrido + niebla lima que
+  // se asienta) y la línea marcada se "pega" como cinta
   gsap.utils.toArray<HTMLElement>('[data-reveal]').forEach((el) => {
-    gsap.from(el.querySelectorAll('.line'), {
-      rotateX: -95,
-      yPercent: 30,
-      opacity: 0,
-      transformOrigin: '50% 0%',
-      stagger: 0.12,
-      duration: 1.3,
-      ease: 'expo.out',
-      scrollTrigger: { trigger: el, start: 'top 82%' },
+    const tl = gsap.timeline({ scrollTrigger: { trigger: el, start: 'top 82%' } })
+    el.querySelectorAll<HTMLElement>('.line').forEach((line, i) => {
+      if (line.classList.contains('h-graf--ink')) {
+        tl.fromTo(line, { scaleX: 0, transformOrigin: '0% 50%', rotate: -8 }, { scaleX: 1, rotate: -2, duration: 0.5, ease: 'back.out(2.2)' }, i * 0.28)
+      } else {
+        tl.fromTo(line,
+          { clipPath: 'inset(-40% 100% -60% -5%)', textShadow: '0 0 30px rgba(200,243,29,.95)' },
+          { clipPath: 'inset(-40% -5% -60% -5%)', textShadow: '0 0 0px rgba(200,243,29,0)', duration: 1.1, ease: 'power2.inOut' },
+          i * 0.28)
+      }
     })
   })
-  // El graffiti se "pinta" de izquierda a derecha
-  gsap.utils.toArray<HTMLElement>('.h-graf').forEach((el) => {
-    if (el.closest('.tag')) return
+  // Lima suelto (subtítulos graffiti fuera de data-reveal)
+  gsap.utils.toArray<HTMLElement>('.h-graf--lime').forEach((el) => {
     gsap.fromTo(el, { clipPath: 'inset(-30% 100% -30% -5%)' }, {
-      clipPath: 'inset(-30% -5% -30% -5%)',
-      duration: 1.1,
-      ease: 'power2.inOut',
-      scrollTrigger: { trigger: el, start: 'top 85%' },
+      clipPath: 'inset(-30% -5% -30% -5%)', duration: 1.1, ease: 'power2.inOut',
+      scrollTrigger: { trigger: el, start: 'top 88%' },
     })
   })
+
+  // Etiquetas técnicas: se decodifican al entrar
+  gsap.utils.toArray<HTMLElement>('.label, .trabajo__hint, .photos__hint, .facts__l, .hablemos__quote').forEach((el) => {
+    ScrollTrigger.create({ trigger: el, start: 'top 92%', once: true, onEnter: () => scrambleIn(el, 900) })
+  })
+
+  // Párrafos: palabra por palabra desde abajo, el resaltado lima se barre
+  document.querySelectorAll<HTMLElement>('.yo__text p').forEach((p) => {
+    const words = splitWords(p)
+    gsap.from(words, {
+      yPercent: 110, rotate: 6, duration: 0.7, ease: 'expo.out', stagger: 0.012,
+      scrollTrigger: { trigger: p, start: 'top 85%' },
+    })
+  })
+  gsap.from('.yo__text strong', {
+    backgroundSize: '0% 100%', duration: 0.8, ease: 'power2.inOut', delay: 0.3,
+    scrollTrigger: { trigger: '.yo__text', start: 'top 80%' },
+  })
+
+  // Números: cuentan con ruido hasta su valor
+  document.querySelectorAll<HTMLElement>('.facts__n').forEach((n) => {
+    const final = n.textContent!
+    ScrollTrigger.create({
+      trigger: n, start: 'top 88%', once: true,
+      onEnter: () => {
+        const o = { p: 0 }
+        gsap.to(o, {
+          p: 1, duration: 1.2, ease: 'power2.out',
+          onUpdate: () => {
+            n.textContent = o.p >= 1 ? final : [...final].map((c) => (/\d/.test(c) ? String((Math.random() * 10) | 0) : c)).join('')
+          },
+        })
+      },
+    })
+  })
+
+  // Links: se decodifican al pasar el cursor
+  document.querySelectorAll<HTMLElement>('.hud__nav a, .hablemos__links a, .foot a, .case__close').forEach((a) =>
+    a.addEventListener('pointerenter', () => scrambleIn(a, 350)),
+  )
+
+  // Correo: cada letra salta cuando pasas encima (onda)
+  const mail = document.querySelector<HTMLElement>('.hablemos__mail')!
+  const mailText = [...mail.childNodes].find((n) => n.nodeType === 3 && n.nodeValue!.trim()) as Text
+  const chars = mailText.nodeValue!.trim()
+  const wrap = document.createElement('span')
+  wrap.className = 'mail__chars'
+  wrap.innerHTML = [...chars].map((c) => `<span class="mc">${c}</span>`).join('')
+  mailText.replaceWith(wrap)
+  const mcs = wrap.querySelectorAll<HTMLElement>('.mc')
+  mail.addEventListener('pointerenter', () => {
+    gsap.fromTo(mcs, { y: 0 }, { y: -14, duration: 0.18, ease: 'power2.out', yoyo: true, repeat: 1, stagger: 0.018 })
+    gsap.fromTo(mcs, { color: '#c8f31d' }, { color: '#e7e4dc', duration: 0.6, stagger: 0.018 })
+  })
+
+  // Marquesina: sigue al scroll (dirección y velocidad)
+  const mq = document.querySelector<HTMLElement>('.marquee__inner')!
+  mq.style.animation = 'none'
+  let mx = 0
+  gsap.ticker.add(() => {
+    const w = mq.scrollWidth / 2
+    mx -= (1.1 + Math.abs(scrollFx.v) * 0.6) * scrollFx.dir
+    if (mx <= -w) mx += w
+    if (mx > 0) mx -= w
+    mq.style.transform = `translate3d(${mx}px,0,0)`
+  })
+
+  // Doodle: el monito respira y saluda
+  gsap.to('.doodle svg', { rotate: 3, transformOrigin: '30% 100%', duration: 1.6, ease: 'sine.inOut', yoyo: true, repeat: -1 })
 
   gsap.utils.toArray<SVGElement>('.sigil').forEach((s) => {
     gsap.fromTo(s, { rotateY: -70, rotateZ: -12, scale: 0.6, opacity: 0 }, {
@@ -292,12 +375,12 @@ function extrude() {
   const draw = () => {
     m.x += (m.tx - m.x) * 0.08
     m.y += (m.ty - m.y) * 0.08
-    const depth = 10
-    const dx = -m.x * 1.8 + 0.2
-    const dy = -m.y * 1.8 + 0.4
+    const depth = 18
+    const dx = -m.x * 2.6 + 0.25
+    const dy = -m.y * 2.6 + 0.5
     const layers: string[] = []
     for (let i = 1; i <= depth; i++) {
-      const c = i === depth ? 'var(--lime)' : '#1f1f1d'
+      const c = i === depth ? 'var(--lime)' : i % 2 ? '#1d1d1b' : '#2a2a28'
       layers.push(`${(dx * i).toFixed(1)}px ${(dy * i + i * 0.6).toFixed(1)}px 0 ${c}`)
     }
     el.style.setProperty('--ts', layers.join(','))
