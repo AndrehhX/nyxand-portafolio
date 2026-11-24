@@ -1,7 +1,11 @@
 {
-  "name": "nyxand-tinta-senal",
+  "name": "nyxand-portafolio",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "Portafolio oficial de Dereck Andreh Callejas Ajin (NyxAnd).",
+  "author": "Dereck Andreh Callejas Ajin (NyxAnd) <andrehcallex@gmail.com>",
+  "license": "SEE LICENSE IN LICENSE",
+  "homepage": "https://nyxand.site",
   "type": "module",
   "scripts": {
     "dev": "vite",

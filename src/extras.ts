@@ -8,7 +8,9 @@ export function initProgress(getVelocity: () => number) {
   const svg = document.createElementNS(NS, 'svg')
   svg.setAttribute('class', 'progress')
   svg.setAttribute('aria-hidden', 'true')
-  svg.innerHTML = `<g filter="url(#goo)"><rect x="5" y="-20" width="7" rx="3.5"/><circle cx="8.5" r="7"/></g>`
+  // sin filtro goo: re-filtrar este SVG de pantalla completa en cada frame de
+  // scroll costaba más que lo que aportaba (chorro + bulbo ya se leen bien)
+  svg.innerHTML = `<rect x="5" y="-20" width="7" rx="3.5"/><circle cx="8.5" r="7"/>`
   document.body.appendChild(svg)
   const rect = svg.querySelector('rect')!
   const tip = svg.querySelector('circle')!

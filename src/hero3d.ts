@@ -341,6 +341,13 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
   new IntersectionObserver(([en]) => (visible = en.isIntersecting)).observe(canvas)
   addEventListener('resize', resize)
   resize()
+  // compilar shaders AHORA (detrás del contador) y no en el primer frame de
+  // la caída, que era un tirón visible justo en el momento más importante
+  await yieldMain()
+  letters.forEach((m) => (m.visible = true))
+  renderer.compile(scene, camera)
+  letters.forEach((m) => (m.visible = dropped))
+  composer.render()
 
   const fxs = { shake: 0, flash: 0, burst: 0, lens: 0, photo: reduce ? 1 : 0 }
   let nextBurst = 4
@@ -399,6 +406,8 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
   function frame(now = 0) {
     requestAnimationFrame(frame)
     if (!visible || !lines.length || now - lastFrame < minFrame) return
+    // durante la intro las letras aún no se ven: no gastar GPU detrás del contador
+    if (!dropped) return
     lastFrame = now
     render()
   }

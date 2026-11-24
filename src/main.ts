@@ -1,3 +1,4 @@
+import { signConsole } from './watermark'
 import { lite } from './device'
 import '@fontsource/jacquard-24/latin-400.css'
 import './style.css'
@@ -42,6 +43,7 @@ document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) =>
 // Arranque por partes: la intro (y la carga del 3D) empiezan ya; el resto se
 // monta en tareas cortas mientras corre el contador, sin congelar la página.
 const yieldMain = () => new Promise<void>((r) => setTimeout(r, 0))
+signConsole()
 runIntro()
 const booted = boot()
 
