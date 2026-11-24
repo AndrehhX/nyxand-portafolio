@@ -7,7 +7,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
 import { buildFilm, initCase } from './film'
 import { mountSigils } from './sigil'
-import { initPhotos, initStickers, slapStickers } from './interact'
+import { initPhotos } from './interact'
 import { buildTapes, buildTears, fitText, initClock, initCursor, initGrain, splitChars } from './fx'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -39,7 +39,6 @@ splitChars()
 initCase(lenis)
 buildTapes()
 
-initStickers()
 initPhotos(reduce)
 runIntro()
 
@@ -85,7 +84,8 @@ async function runIntro() {
   lenis?.start()
 
   if (hero) await hero.drop()
-  slapStickers()
+  gsap.from('.namebar', { scaleX: 0, duration: 0.5, ease: 'expo.out' })
+  gsap.from('.namebar > span', { yPercent: 100, opacity: 0, stagger: 0.06, duration: 0.4, delay: 0.25 })
   gsap.from('.corner, .hero__status', { opacity: 0, y: 12, stagger: 0.06, duration: 0.5 })
 }
 

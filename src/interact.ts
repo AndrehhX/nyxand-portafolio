@@ -1,54 +1,5 @@
 import gsap from 'gsap'
 
-// Cualquier [data-drag] se puede arrastrar (stickers, etc.).
-let z = 20
-export function makeDraggable(el: HTMLElement, onMove?: (x: number, y: number) => void) {
-  let x = 0
-  let y = 0
-  el.style.touchAction = 'none'
-  el.addEventListener('pointerdown', (e) => {
-    e.stopPropagation()
-    el.setPointerCapture(e.pointerId)
-    el.style.zIndex = String(++z)
-    el.classList.add('is-drag')
-    const sx = e.clientX - x
-    const sy = e.clientY - y
-    const mv = (ev: PointerEvent) => {
-      x = ev.clientX - sx
-      y = ev.clientY - sy
-      el.style.translate = `${x}px ${y}px`
-      onMove?.(x, y)
-    }
-    const up = () => {
-      el.removeEventListener('pointermove', mv)
-      el.removeEventListener('pointerup', up)
-      el.removeEventListener('pointercancel', up)
-      el.classList.remove('is-drag')
-    }
-    el.addEventListener('pointermove', mv)
-    el.addEventListener('pointerup', up)
-    el.addEventListener('pointercancel', up)
-  })
-}
-
-export function initStickers() {
-  document.querySelectorAll<HTMLElement>('[data-drag]').forEach((s) => makeDraggable(s))
-}
-
-// Stickers "pegados" de golpe tras la caída de las letras
-export function slapStickers() {
-  const s = gsap.utils.toArray<HTMLElement>('.sticker')
-  gsap.set(s, { visibility: 'visible' })
-  return gsap.from(s, {
-    scale: 3,
-    opacity: 0,
-    rotate: (i) => (i % 2 ? 40 : -40),
-    duration: 0.45,
-    ease: 'back.out(1.8)',
-    stagger: 0.14,
-  })
-}
-
 // Carrusel de fotos: arrastre con inercia, rebote en bordes y
 // tarjetas que se inclinan en 3D según la velocidad.
 export function initPhotos(reduce: boolean) {
@@ -112,7 +63,7 @@ export function initPhotos(reduce: boolean) {
     }
     track.style.transform = `translate3d(${x}px,0,0)`
     const tilt = Math.max(-28, Math.min(28, -v * 1.6))
-    prints.forEach((p) => (p.style.transform = `rotateY(${tilt}deg) rotate(var(--r))`))
+    prints.forEach((p) => (p.style.transform = `rotateY(${tilt}deg)`))
   })
 
   // evitar que un arrastre cuente como click

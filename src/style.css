@@ -222,59 +222,31 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
 .intro__bar { height: 6px; margin-top: 20px; background: var(--ink-3); }
 .intro__bar i { display: block; height: 100%; background: var(--lime); transform: scaleX(0); transform-origin: left; }
 
-/* ---------- stickers ---------- */
-.stickers { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
-.sticker {
+/* ---------- barra de nombre (losa dura, sin adornos) ---------- */
+.namebar {
   position: absolute;
-  left: var(--x);
-  top: var(--y);
-  transform: translate(-50%, -50%) rotate(var(--r));
-  visibility: hidden;
-  pointer-events: auto;
-  cursor: grab;
-  user-select: none;
-  white-space: nowrap;
-  box-shadow: 0 0 0 5px #fff, 8px 10px 0 5px rgba(0, 0, 0, 0.55);
-  transition: box-shadow 0.15s;
-}
-.sticker.is-drag { cursor: grabbing; box-shadow: 0 0 0 5px #fff, 16px 22px 0 5px rgba(0, 0, 0, 0.45); }
-.sticker--name {
-  padding: 10px 18px 8px;
+  left: 0;
+  right: 0;
+  bottom: clamp(70px, 11vh, 110px);
+  z-index: 3;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  align-items: stretch;
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--display);
-  font-size: clamp(30px, 3.6vw, 58px);
-  line-height: 0.95;
-  text-align: center;
+  pointer-events: none;
+  transform-origin: left center;
 }
-.sticker--name small { display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.16em; font-weight: 700; margin-top: 4px; }
-.sticker--round {
-  display: grid;
-  place-content: center;
-  width: clamp(110px, 10vw, 150px);
-  aspect-ratio: 1;
-  border-radius: 50%;
-  background: var(--lime);
-  color: var(--ink);
+.namebar > span { padding: 8px var(--gut) 6px; border-left: 2px solid var(--ink); }
+.namebar__name {
+  border-left: 0 !important;
   font-family: var(--display);
-  font-size: clamp(17px, 1.6vw, 24px);
+  font-size: clamp(34px, 6.2vw, 104px);
   line-height: 0.9;
-  text-align: center;
-  white-space: normal;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
 }
-.sticker--round .goth { display: block; font-size: 1.7em; line-height: 0.8; }
-.sticker--ink {
-  padding: 10px 14px;
-  background: var(--ink);
-  color: var(--paper);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-  line-height: 1.3;
-  outline: 2px dashed var(--lime);
-  outline-offset: -7px;
-}
-.sticker--ink b { display: block; font-family: var(--goth); font-size: 44px; letter-spacing: 0; line-height: 0.9; color: var(--lime); }
+.namebar__meta { display: flex; align-items: center; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; line-height: 1.35; }
 
 /* ---------- fotos ---------- */
 .photos { margin: clamp(60px, 9vw, 130px) calc(var(--gut) * -1) 0; overflow: hidden; cursor: grab; touch-action: pan-y; user-select: none; }
@@ -298,80 +270,46 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
   perspective: 1200px;
   will-change: transform;
 }
+.photos__track { gap: 0; padding-top: 0; padding-bottom: 0; }
 .print {
   position: relative;
-  width: clamp(220px, 24vw, 340px);
-  padding: 12px 12px 0;
-  background: #f4f2ec;
-  box-shadow: 0 18px 30px rgba(0, 0, 0, 0.18), 0 2px 0 rgba(0, 0, 0, 0.1);
-  transform: rotate(var(--r));
+  width: clamp(240px, 26vw, 380px);
+  margin-right: -2px;
+  border: 2px solid var(--ink);
+  background: var(--ink);
   transform-style: preserve-3d;
-}
-.print::before {
-  content: '';
-  position: absolute;
-  top: -12px;
-  left: 50%;
-  z-index: 2;
-  width: 90px;
-  height: 26px;
-  translate: -50% 0;
-  rotate: -4deg;
-  background: rgba(200, 243, 29, 0.75);
-  mix-blend-mode: multiply;
 }
 .print img {
   display: block;
   width: 100%;
   aspect-ratio: 3 / 4;
   object-fit: cover;
-  filter: grayscale(1) contrast(1.45) brightness(1.04);
+  filter: grayscale(1) contrast(1.6) brightness(1.05);
   pointer-events: none;
 }
 .print::after {
   /* trama de fotocopia */
   content: '';
   position: absolute;
-  inset: 12px 12px auto;
+  inset: 0 0 auto;
   aspect-ratio: 3 / 4;
-  background: radial-gradient(circle, rgba(0, 0, 0, 0.28) 0.6px, transparent 1.2px) 0 0 / 4px 4px;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.35) 0.7px, transparent 1.3px) 0 0 / 4px 4px;
   mix-blend-mode: multiply;
   pointer-events: none;
 }
-.print figcaption { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 0 10px; padding: 10px 2px 12px; }
-.print figcaption b { font-family: var(--pixgoth); font-size: 40px; line-height: 0.8; grid-row: span 2; }
-.print figcaption .goth { font-size: 28px; line-height: 0.9; }
-.print figcaption em { font-style: normal; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.65; }
-
-/* ---------- cinta de precaución ---------- */
-.caution { position: relative; height: clamp(170px, 18vw, 260px); background: var(--ink); overflow: hidden; margin-top: -1px; }
-.caution__tape {
-  position: absolute;
-  left: -10%;
-  width: 120%;
-  top: 50%;
-  padding: 10px 0;
-  overflow: hidden;
-  white-space: nowrap;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.5);
+.print figcaption {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: end;
+  gap: 0 12px;
+  padding: 10px 12px 10px;
+  background: var(--ink);
+  color: var(--paper);
 }
-.caution__tape::before,
-.caution__tape::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  height: 10px;
-  background: repeating-linear-gradient(-45deg, var(--ink) 0 12px, var(--lime) 12px 24px);
-}
-.caution__tape::before { top: 0; }
-.caution__tape::after { bottom: 0; }
-.caution__tape--a { background: var(--lime); color: var(--ink); translate: 0 -50%; rotate: -5deg; z-index: 2; }
-.caution__tape--b { background: var(--paper); color: var(--ink); translate: 0 -50%; rotate: 4deg; }
-.caution__tape--b::before, .caution__tape--b::after { background: repeating-linear-gradient(45deg, var(--ink) 0 12px, var(--paper) 12px 24px); }
-.caution__run { display: inline-flex; animation: marquee 18s linear infinite; }
-.caution__tape--b .caution__run { animation-direction: reverse; animation-duration: 24s; }
-.caution__run span { font-family: var(--display); font-size: clamp(26px, 3vw, 44px); line-height: 1.25; padding-right: 0.3em; }
+.print figcaption b { font-family: var(--pixgoth); font-size: 64px; line-height: 0.7; color: var(--lime); grid-row: span 2; }
+.print figcaption span { font-family: var(--display); font-size: 30px; line-height: 0.9; }
+.print figcaption em { font-style: normal; font-size: 10px; letter-spacing: 0.14em; opacity: 0.6; }
+.print:hover img { filter: grayscale(1) contrast(2.4) brightness(1.1); }
 
 /* ---------- rasgados ---------- */
 .tear { position: relative; height: clamp(56px, 9vw, 130px); margin: -1px 0; overflow: hidden; }
@@ -869,10 +807,10 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
   .hud__cta { display: block; }
   .hud__time { display: none; }
   .corner--bl, .corner--br, .corner--tr { display: none; }
-  .sticker--name { --y: 82% !important; }
-  .sticker--round { --x: 80% !important; --y: 21% !important; }
-  .sticker--ink { --x: 22% !important; --y: 90% !important; display: none; }
   .hero__status { bottom: 18px; }
+  .namebar { grid-template-columns: 1fr auto; bottom: 64px; }
+  .namebar > span:last-child { display: none; }
+  .namebar__meta { font-size: 9px; }
   .corner--tl, .corner--tr { top: 62px; }
   .hero__status { left: var(--gut); translate: 0 0; }
   .yo__grid { grid-template-columns: 1fr; }

@@ -1,7 +1,7 @@
-// Hero WebGL: "NyxAnd" en blackletter 3D de cromo con piercings, sobre la
-// foto de Andreh tramada a 1-bit. El cursor abre una lente de rayos X
-// (todo pasa a dithering), mantener presionado derrite las letras, el
-// scroll lo desintegra en píxeles y cada tanto hay ráfagas de glitch.
+// Hero WebGL: "NyxAnd" en blackletter 3D de cromo con piercings, tramado a
+// 1-bit sobre la foto de Andreh. El cursor abre una lente que revela el
+// cromo real, mantener presionado derrite las letras, el scroll lo
+// desintegra en píxeles y cada tanto hay ráfagas de glitch.
 import * as THREE from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -84,20 +84,17 @@ const HeroShader = {
       // foto tramada de fondo
       float pl = luma(texture2D(tPhoto, coverUV(puv)).rgb);
       pl = smoothstep(0.12, 0.85, pl);
-      vec3 photoLo = mix(ink, vec3(0.20, 0.20, 0.19), uPhotoOn);
-      vec3 photoHi = mix(ink, paper, uPhotoOn);
-      vec3 bg = pl > t ? mix(photoLo, photoHi, lens) : ink;
+      vec3 photoLo = mix(ink, vec3(0.19, 0.19, 0.18), uPhotoOn);
+      vec3 bg = (pl > t ? photoLo : ink) * (1.0 - lens);
 
-      // letras: cromo limpio, o tramadas en la lente / al desintegrarse
+      // letras: 1-bit por defecto (con piso alto para que se lean),
+      // la lente revela el cromo real
       vec4 sharp = texture2D(tDiffuse, uv);
       vec4 px = texture2D(tDiffuse, puv);
-      float ll = 0.25 + 0.75 * smoothstep(0.0, 0.8, luma(px.rgb));
+      float ll = 0.42 + 0.58 * smoothstep(0.0, 0.7, luma(px.rgb)) - uDis * 0.25;
       vec3 dl = ll > t ? (px.g > px.r * 1.25 ? lime : paper) : ink;
-      vec3 xray = ll > t ? lime : ink;
-      float dis = clamp(uDis, 0.0, 1.0);
-      vec3 letters = mix(sharp.rgb, dl, dis);
-      letters = mix(letters, xray, lens);
-      float a = mix(sharp.a, px.a, max(dis, lens));
+      vec3 letters = mix(dl, sharp.rgb, lens);
+      float a = mix(px.a, sharp.a, lens);
 
       vec3 col = mix(bg, letters, step(0.5, a));
 
