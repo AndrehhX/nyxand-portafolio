@@ -11,8 +11,9 @@
   --lime: #c8f31d;
   --mono: 'JetBrains Mono', ui-monospace, monospace;
   --display: 'Anton', Impact, sans-serif;
-  --goth: 'Grenze Gotisch', 'UnifrakturMaguntia', serif;
-  --pixgoth: 'Jacquard 24', 'Grenze Gotisch', serif;
+  /* la gótica se retiró: todo lo que la pedía usa el graffiti */
+  --goth: 'Sedgwick Ave Display', cursive;
+  --pixgoth: 'Jacquard 24', 'JetBrains Mono', monospace;
   --gut: clamp(16px, 3vw, 40px);
 }
 
@@ -1091,6 +1092,31 @@ a, button { transition: color 0.25s ease, background-color 0.25s ease, opacity 0
 .hud__nav a, .hablemos__links a, .foot a { display: inline-block; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.25s; }
 .hud__nav a:hover, .hablemos__links a:hover { transform: translateY(-2px); text-decoration: none; }
 
+/* accesibilidad */
+.skip {
+  position: fixed;
+  left: 12px;
+  top: -60px;
+  z-index: 300;
+  padding: 10px 14px;
+  background: var(--lime);
+  color: var(--ink);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  transition: top 0.2s;
+}
+.skip:focus { top: 12px; }
+.photos__gl:focus-visible { outline: 3px solid var(--lime); outline-offset: -3px; }
+
+/* caso: lista de lo destacado */
+.case__hl-title { margin: 26px 0 8px; font-size: 10px; letter-spacing: 0.16em; opacity: 0.6; font-weight: 700; }
+.case__hl { counter-reset: hl; display: grid; gap: 10px; max-width: 58ch; }
+.case__hl li { counter-increment: hl; display: grid; grid-template-columns: 2.4em 1fr; font-size: 13px; line-height: 1.5; }
+.case__hl li::before { content: counter(hl, decimal-leading-zero); font-family: var(--pixgoth); font-size: 26px; line-height: 0.8; color: var(--ink); text-shadow: 0.05em 0.05em 0 var(--lime); }
+
+/* modo liviano */
+.lite .grain { animation: none; }
+
 /* barra de progreso que gotea */
 .progress { position: fixed; top: 0; right: 3px; width: 18px; height: 100vh; z-index: 85; pointer-events: none; overflow: visible; fill: var(--lime); }
 
@@ -1112,7 +1138,7 @@ a, button { transition: color 0.25s ease, background-color 0.25s ease, opacity 0
   pointer-events: none;
   box-shadow: 0.06em 0.06em 0 var(--lime);
 }
-.foot__egg { opacity: 0.5; }
+.foot__egg { color: var(--lime); }
 
 /* caso: número a la derecha sobre la esquina de la imagen, título graffiti grande */
 .case__panel { padding-left: calc(var(--gut) + 14px); }

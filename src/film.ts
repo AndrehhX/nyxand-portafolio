@@ -72,7 +72,8 @@ export function buildFilm() {
       (p, i) => `
     <article class="frame">
       <div class="frame__edge"><span>NYX 100 PROFESSIONAL</span><span>▸ ${p.id}A</span></div>
-      <button class="frame__shot" data-open="${i}" data-cursor="abrir caso" aria-label="Abrir caso ${p.name}">
+      <button class="frame__shot" data-open="${i}" data-cursor="abrir caso">
+        <span class="sr-only">Abrir caso ${titleCase(p.name)}:</span>
         ${p.img ? `<img src="${p.img}" alt="Captura de ${p.name}" loading="lazy" draggable="false" />` : '<canvas></canvas>'}
         <span class="frame__num">${p.id}</span>
         <span class="frame__status">${p.status.toUpperCase()}</span>
@@ -117,6 +118,7 @@ export function initCase(lenis: Lenis | null) {
     q<HTMLElement>('.case__status').textContent = p.status
     q<HTMLElement>('.case__kind').textContent = p.kind
     q<HTMLElement>('.case__stack').innerHTML = p.stack.map((s) => `<li>${s}</li>`).join('')
+    q<HTMLElement>('.case__hl').innerHTML = p.highlights.map((h) => `<li>${h}</li>`).join('')
     q<HTMLElement>('.case__links').innerHTML = p.links.length
       ? p.links
           .map((l) => `<a href="${l.href}" target="_blank" rel="noopener" data-cursor="abrir">${l.label} ↗</a>`)
@@ -131,6 +133,7 @@ export function initCase(lenis: Lenis | null) {
       photo.alt = `Captura de ${p.name}`
     } else drawPoster(shot, p, 220, 120)
 
+    q<HTMLElement>('.case__panel').scrollTop = 0 // cada caso abre desde arriba
     lastFocus = document.activeElement as HTMLElement
     root.classList.add('is-open')
     root.setAttribute('aria-hidden', 'false')

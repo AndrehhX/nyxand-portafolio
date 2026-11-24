@@ -8,6 +8,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
 import gsap from 'gsap'
 import opentype from 'opentype.js'
+import { glFrameMs, lite } from './device'
 import fontUrl from '@fontsource/sedgwick-ave-display/files/sedgwick-ave-display-latin-400-normal.woff?url'
 
 const PHOTO = '/media/tono-andreh.webp'
@@ -157,7 +158,7 @@ export type Hero = { drop: (onImpact?: (i: number) => void) => Promise<void> }
 export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Promise<Hero | null> {
   let renderer: THREE.WebGLRenderer
   try {
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' })
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: !lite, powerPreference: 'high-performance' })
   } catch {
     return null
   }
@@ -165,10 +166,13 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
     fetch(fontUrl).then((r) => r.arrayBuffer()),
     new THREE.TextureLoader().loadAsync(PHOTO),
   ])
+  // ceder el hilo entre pasos pesados: varias tareas cortas en vez de una larga
+  const yieldMain = () => new Promise<void>((r) => setTimeout(r, 0))
   const font = opentype.parse(buf)
+  await yieldMain()
 
   // el shader trama a 1-bit: más de 1.5× de resolución no se nota y cuesta
-  const dpr = Math.min(devicePixelRatio || 1, 1.5)
+  const dpr = Math.min(devicePixelRatio || 1, lite ? 1 : 1.5)
   renderer.setPixelRatio(dpr)
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 1.1
@@ -177,6 +181,7 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
   const scene = new THREE.Scene()
   const pmrem = new THREE.PMREMGenerator(renderer)
   scene.environment = studioEnv(pmrem)
+  await yieldMain()
 
   const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 200)
   camera.position.set(0, 0, 20)
@@ -224,7 +229,8 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
         const shapes = glyphShapes(g, scale, x, -li * lineH)
         if (shapes.length) {
           const geo = new THREE.ExtrudeGeometry(shapes, {
-            depth: 0.7, curveSegments: 10, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.035, bevelSegments: 3,
+            // el tramado 1-bit esconde la diferencia: menos segmentos = carga más rápida
+            depth: 0.7, curveSegments: lite ? 4 : 6, bevelEnabled: true, bevelThickness: 0.08, bevelSize: 0.035, bevelSegments: lite ? 1 : 2,
           })
           const mesh = new THREE.Mesh(geo, chrome)
           mesh.userData.line = li
@@ -275,6 +281,7 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
   const img = photo.image as { width: number; height: number }
   fx.uniforms.uPhotoAspect.value = img.width / img.height
   composer.addPass(fx)
+  await yieldMain()
 
   let W = 0
   let H = 0
@@ -380,9 +387,12 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
 
     composer.render()
   }
-  function frame() {
+  let lastFrame = 0
+  function frame(now = 0) {
     requestAnimationFrame(frame)
-    if (visible && lines.length) render()
+    if (!visible || !lines.length || now - lastFrame < glFrameMs) return
+    lastFrame = now
+    render()
   }
 
   // Entrada: las letras caen una por una con impacto

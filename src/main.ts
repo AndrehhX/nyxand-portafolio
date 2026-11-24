@@ -1,6 +1,5 @@
-import '@fontsource/grenze-gotisch/400.css'
-import '@fontsource/grenze-gotisch/900.css'
-import '@fontsource/jacquard-24/400.css'
+import { lite } from './device'
+import '@fontsource/jacquard-24/latin-400.css'
 import './style.css'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -40,25 +39,35 @@ document.querySelectorAll<HTMLAnchorElement>('a[href^="#"]').forEach((a) =>
   }),
 )
 
-initGrain()
-initClock()
-buildTears()
-mountSigils()
-initCursor()
-initCase(lenis)
-buildTapes()
-if (!reduce) {
-  initMelt()
-  initSpray()
-}
-initDrips(() => scrollFx.v, reduce)
-initDoodle(reduce)
-initCaseFx()
-if (!reduce) {
-  initProgress(() => scrollFx.v)
-  initEasterEgg()
-}
+// Arranque por partes: la intro (y la carga del 3D) empiezan ya; el resto se
+// monta en tareas cortas mientras corre el contador, sin congelar la página.
+const yieldMain = () => new Promise<void>((r) => setTimeout(r, 0))
 runIntro()
+const booted = boot()
+
+async function boot() {
+  initGrain()
+  initClock()
+  initCursor()
+  initCase(lenis)
+  await yieldMain()
+  buildTears()
+  mountSigils()
+  await yieldMain()
+  buildTapes()
+  if (!reduce) {
+    initMelt()
+    initSpray()
+  }
+  await yieldMain()
+  initDrips(() => scrollFx.v, reduce)
+  initDoodle(reduce)
+  initCaseFx()
+  if (!reduce) {
+    initProgress(() => scrollFx.v)
+    initEasterEgg()
+  }
+}
 
 // ---------------------------------------------------------------
 // Derretido global: los titulares chorrean más entre más rápido se
@@ -85,7 +94,8 @@ function initMelt() {
     cur += (target - cur) * 0.12
     target *= 0.9
     scrollFx.v *= 0.9
-    updateMelt(cur)
+    // en modo liviano el derretido por scroll se apaga (filtro SVG caro en GPU débil)
+    updateMelt(lite ? 0 : cur)
     skew += (Math.max(-7, Math.min(7, scrollFx.v * 0.12)) - skew) * 0.15
     // tocar una var en :root recalcula estilos de todo: sólo si cambió
     const s = Math.abs(skew) < 0.02 ? '0' : skew.toFixed(2)
@@ -103,13 +113,19 @@ async function runIntro() {
   const num = intro.querySelector<HTMLElement>('[data-count]')!
   const bar = intro.querySelector<HTMLElement>('.intro__bar i')!
   lenis?.stop()
+  // si ya la viste en esta sesión, la intro es más corta
+  let seen = false
+  try {
+    seen = sessionStorage.getItem('nyx-intro') === '1'
+    sessionStorage.setItem('nyx-intro', '1')
+  } catch {}
   const counter = { v: 0 }
   const counting = reduce
     ? Promise.resolve()
     : new Promise<void>((res) =>
         gsap.to(counter, {
           v: 100,
-          duration: 1.6,
+          duration: seen ? 0.5 : 1.6,
           ease: 'power2.inOut',
           onUpdate: () => {
             num.textContent = String(Math.round(counter.v)).padStart(3, '0')
@@ -180,9 +196,12 @@ async function initPhotoReel() {
   }
 }
 
-document.fonts.ready.then(() => {
+document.fonts.ready.then(async () => {
+  await booted // los cortes y demás deben existir antes de animarlos
   fitText()
+  await yieldMain()
   buildFilm() // los pósters usan Anton: dibujarlos con la fuente ya cargada
+  await yieldMain()
   if (!reduce) animate()
   ScrollTrigger.refresh()
 })

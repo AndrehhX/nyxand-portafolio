@@ -2,6 +2,7 @@
 // se arquea y se derrite según la velocidad del arrastre. Al pasar el
 // cursor la foto se revela en escala de grises; la del centro gotea sola.
 import * as THREE from 'three'
+import { glFrameMs, lite } from './device'
 
 export const PHOTOS = [
   { src: '/media/tono-andreh.webp', t: 'ANDREH', m: 'IMG_0001 · GT' },
@@ -99,7 +100,7 @@ export async function initPhotos3D(
   } catch {
     return false
   }
-  const dpr = Math.min(devicePixelRatio || 1, 1.5)
+  const dpr = Math.min(devicePixelRatio || 1, lite ? 1 : 1.5)
   renderer.setPixelRatio(dpr)
   renderer.setClearColor(0x000000, 0)
 
@@ -194,6 +195,18 @@ export async function initPhotos3D(
   canvas.addEventListener('pointerup', end)
   canvas.addEventListener('pointercancel', end)
   canvas.addEventListener('pointerleave', () => (pointerX = -1e4))
+  // teclado: ← → empujan la tira (el canvas es enfocable)
+  canvas.tabIndex = 0
+  canvas.setAttribute('role', 'region')
+  canvas.setAttribute('aria-label', 'Carrusel de fotos personales. Usa las flechas izquierda y derecha.')
+  canvas.removeAttribute('aria-hidden')
+  canvas.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') vel += 14
+    else if (e.key === 'ArrowRight') vel -= 14
+    else return
+    e.preventDefault()
+    idle = performance.now()
+  })
 
   let visible = false
   new IntersectionObserver(([en]) => (visible = en.isIntersecting)).observe(canvas)
@@ -202,9 +215,11 @@ export async function initPhotos3D(
   let lastActive = -1
   const wrap = (x: number) => ((((x + total / 2) % total) + total) % total) - total / 2
 
-  function frame() {
+  let lastFrame = 0
+  function frame(now = 0) {
     requestAnimationFrame(frame)
-    if (!visible) return
+    if (!visible || now - lastFrame < glFrameMs) return
+    lastFrame = now
     const t = clock.getElapsedTime()
     if (!dragging) {
       if (!reduce && performance.now() - idle > 1500) vel += (-0.7 - vel) * 0.02

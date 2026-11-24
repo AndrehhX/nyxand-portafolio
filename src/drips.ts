@@ -4,6 +4,7 @@
 // borde, la punta se hincha sola y cuando una gota se separa se ve el
 // cuello estirarse y romperse, como pintura de verdad.
 import gsap from 'gsap'
+import { lite } from './device'
 
 const NS = 'http://www.w3.org/2000/svg'
 
@@ -60,7 +61,7 @@ export function initDrips(getVelocity: () => number, reduce: boolean) {
     const band = document.createElementNS(NS, 'path')
     g.appendChild(band)
 
-    const count = Math.round(12 + r() * 6)
+    const count = Math.round((lite ? 7 : 12) + r() * 6)
     const drips: Drip[] = []
     for (let i = 0; i < count; i++) {
       const thick = r() < 0.3
@@ -156,6 +157,18 @@ export function initDrips(getVelocity: () => number, reduce: boolean) {
           drops.splice(i, 1)
         }
       }
+    }
+    if (lite || reduce) {
+      // liviano: se dibujan una vez (con el goo) y se quedan quietas;
+      // re-filtrar SVG en cada frame es caro en móviles y GPUs débiles
+      const once = () => {
+        if (!W) return requestAnimationFrame(once)
+        visible = true
+        drips.forEach((d) => (d.len = d.max * (0.5 + Math.random() * 0.45)))
+        tick()
+      }
+      requestAnimationFrame(once)
+      return
     }
     gsap.ticker.add(tick)
   })
