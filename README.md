@@ -9,7 +9,9 @@ La dirección visual mezcla lo hecho a mano (tinta, brocha, papel rasgado, garab
 - **Intro**: contador en pixel-gótico mientras carga el 3D; luego las letras caen con impacto (temblor de cámara y flash) y el nombre se pinta como tag de aerosol que chorrea.
 - **Tipografía urbana**: una sola display, graffiti (Sedgwick Ave Display), también en el NyxAnd 3D; mono para el resto y lima sólo como acento. Los titulares se derriten con un filtro SVG cuya intensidad depende de la velocidad del scroll.
 - **Todo animado**: cursor de aerosol que pinta (lima sobre negro, tinta sobre papel) y chorrea si te quedas quieto; titulares que se pintan con niebla de spray, se derriten al pasarles el cursor y se inclinan con la velocidad del scroll; párrafos palabra por palabra; etiquetas y links que se decodifican; números que cuentan; correo con letras que saltan; marquesina que sigue la dirección del scroll; status con glitch.
-- **Cortes multicapa**: entre secciones la página se rompe y deja ver capas de sticker roto lima y negro/blanco. De la hoja cuelgan gotas realistas (cuello, bulbo, brillo húmedo) que crecen por su peso, sueltan gotas que caen acelerando y gotean más con scroll rápido.
+- **Cortes multicapa**: entre secciones la página se rompe y deja ver capas de sticker roto lima y negro/blanco. De la hoja cuelgan chorreados con física simple y filtro metaball ("goo"): la pintura se acumula en la punta, baja por su peso, se desprende una gota con cuello que se estira y rompe, y gotea más con scroll rápido.
+- **Extras**: barra de progreso que es un chorro de pintura lima por el borde derecho; panel de caso con borde rasgado (distinto cada vez) e imagen que se "revela"; easter egg: escribe `nyx` en cualquier parte para un MELTDOWN de toda la página.
+- **Rendimiento**: WebGL y animaciones se pausan fuera de pantalla, resolución tope 1.5×, grano en capa pequeña de GPU, canvas del spray sin costo en reposo, variables CSS globales sólo se tocan al cambiar.
 - **Monito a mano**: se dibuja trazo por trazo como con plumón, con línea que "hierve" a 12 fps; después cabecea de sueño, teclea, parpadea, le cae una gota de sudor y el código parpadea en la laptop.
 - **Foto real tramada** a 1-bit como fondo del hero, y carrusel WebGL infinito "Fuera del código" que se arquea y se derrite según la velocidad del arrastre.
 - **Capturas reales** de Orunei y Kaze en el carrete (se revelan a color al pasar el cursor).
@@ -58,6 +60,7 @@ El build es estático: se puede desplegar en Vercel, Netlify o cualquier hosting
     ├── photos3d.ts     # Carrusel WebGL de fotos que se derrite
     ├── drips.ts        # Gotas animadas en los cortes
     ├── doodle.ts       # Animación del monito dibujado a mano
+    ├── extras.ts       # Progreso que gotea, panel rasgado, easter egg
     ├── interact.ts     # Carrusel DOM de respaldo (sin WebGL)
     ├── film.ts         # Carrete de proyectos, pósters 1-bit y panel de caso
     ├── projects.ts     # Datos de los proyectos

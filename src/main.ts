@@ -10,6 +10,7 @@ import { mountSigils } from './sigil'
 import { initPhotos } from './interact'
 import { initDrips } from './drips'
 import { initDoodle } from './doodle'
+import { initCaseFx, initEasterEgg, initProgress } from './extras'
 import {
   buildTapes, buildTears, fitText, initClock, initCursor, initGrain, initMeltables, initSpray,
   scramble, scrambleIn, splitWords,
@@ -52,6 +53,11 @@ if (!reduce) {
 }
 initDrips(() => scrollFx.v, reduce)
 initDoodle(reduce)
+initCaseFx()
+if (!reduce) {
+  initProgress(() => scrollFx.v)
+  initEasterEgg()
+}
 runIntro()
 
 // ---------------------------------------------------------------
@@ -67,6 +73,7 @@ function initMelt() {
   let target = 0
   let lastY = scrollY
   let skew = 0
+  let lastSkew = ''
   addEventListener('scroll', () => {
     const v = scrollY - lastY
     lastY = scrollY
@@ -80,7 +87,12 @@ function initMelt() {
     scrollFx.v *= 0.9
     updateMelt(cur)
     skew += (Math.max(-7, Math.min(7, scrollFx.v * 0.12)) - skew) * 0.15
-    root.style.setProperty('--skew', `${skew.toFixed(2)}deg`)
+    // tocar una var en :root recalcula estilos de todo: sólo si cambió
+    const s = Math.abs(skew) < 0.02 ? '0' : skew.toFixed(2)
+    if (s !== lastSkew) {
+      lastSkew = s
+      root.style.setProperty('--skew', `${s}deg`)
+    }
   })
 }
 
@@ -274,8 +286,13 @@ function animate() {
   const mq = document.querySelector<HTMLElement>('.marquee__inner')!
   mq.style.animation = 'none'
   let mx = 0
+  let mqOn = false
+  let mqW = mq.scrollWidth / 2
+  addEventListener('resize', () => (mqW = mq.scrollWidth / 2))
+  new IntersectionObserver(([en]) => (mqOn = en.isIntersecting)).observe(mq)
   gsap.ticker.add(() => {
-    const w = mq.scrollWidth / 2
+    if (!mqOn) return
+    const w = mqW
     mx -= (1.1 + Math.abs(scrollFx.v) * 0.6) * scrollFx.dir
     if (mx <= -w) mx += w
     if (mx > 0) mx -= w
@@ -322,7 +339,8 @@ function animate() {
       track.style.transform = `translateZ(${-R}px) rotateX(-5deg) rotateY(${state.r}deg)`
       frames.forEach((f, i) => {
         const d = Math.abs(i * A + state.r)
-        f.style.filter = `brightness(${Math.max(0.25, 1 - d / 110)})`
+        // opacity (compuesta en GPU) en vez de filter: brightness (repinta)
+        f.style.opacity = String(Math.max(0.22, 1 - d / 100))
         f.classList.toggle('is-front', d < A / 2)
       })
     }
@@ -345,7 +363,7 @@ function animate() {
       track.style.transform = ''
       frames.forEach((f) => {
         f.style.transform = ''
-        f.style.filter = ''
+        f.style.opacity = ''
       })
     }
   })
@@ -376,7 +394,11 @@ function extrude() {
     m.tx = e.clientX / innerWidth - 0.5
     m.ty = e.clientY / innerHeight - 0.5
   })
+  let on = false
+  new IntersectionObserver(([en]) => (on = en.isIntersecting)).observe(el)
   const draw = () => {
+    // fuera de pantalla o ya asentado: no repintar
+    if (!on || (Math.abs(m.tx - m.x) < 0.001 && Math.abs(m.ty - m.y) < 0.001 && el.style.getPropertyValue('--ts'))) return
     m.x += (m.tx - m.x) * 0.08
     m.y += (m.ty - m.y) * 0.08
     const depth = 18

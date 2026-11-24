@@ -167,7 +167,8 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
   ])
   const font = opentype.parse(buf)
 
-  const dpr = Math.min(devicePixelRatio || 1, 1.75)
+  // el shader trama a 1-bit: más de 1.5× de resolución no se nota y cuesta
+  const dpr = Math.min(devicePixelRatio || 1, 1.5)
   renderer.setPixelRatio(dpr)
   renderer.toneMapping = THREE.ACESFilmicToneMapping
   renderer.toneMappingExposure = 1.1
@@ -311,6 +312,10 @@ export async function initHero3D(canvas: HTMLCanvasElement, reduce: boolean): Pr
     mouse.on = true
   })
   canvas.addEventListener('pointerdown', () => (melt = 1))
+  addEventListener('nyx-melt', () => {
+    melt = 1
+    setTimeout(() => (melt = 0), 2600)
+  })
   addEventListener('pointerup', () => (melt = 0))
   addEventListener('pointercancel', () => (melt = 0))
 

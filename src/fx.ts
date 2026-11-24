@@ -188,7 +188,7 @@ export function initSpray() {
   const o = c.getContext('2d')!
   let dpr = 1
   const size = () => {
-    dpr = Math.min(devicePixelRatio || 1, 2)
+    dpr = Math.min(devicePixelRatio || 1, 1.5)
     c.width = innerWidth * dpr
     c.height = innerHeight * dpr
     o.setTransform(dpr, 0, 0, dpr, 0, 0)
@@ -203,6 +203,9 @@ export function initSpray() {
   let first = true
   let col = '#c8f31d'
   let still = 0
+  let moves = 0
+  let blocked: boolean | null = null
+  let dirty = false
   const gauss = () => (Math.random() + Math.random() + Math.random() - 1.5) / 1.5
 
   addEventListener('pointermove', (e) => {
@@ -216,9 +219,13 @@ export function initSpray() {
     lx = e.clientX
     ly = e.clientY
     still = 0
-    const el = document.elementFromPoint(lx, ly)
-    if (el?.closest('.case, .hud, a, button')) return
-    col = el?.closest('.paper') ? '#0b0b0a' : '#c8f31d'
+    // el hit-test cuesta: sólo cada 4 movimientos
+    if (++moves % 4 === 0 || blocked === null) {
+      const el = document.elementFromPoint(lx, ly)
+      blocked = !!el?.closest('.case, .hud, a, button')
+      col = el?.closest('.paper') ? '#0b0b0a' : '#c8f31d'
+    }
+    if (blocked) return
     const n = 4 + Math.round(sp * 14)
     const spread = 5 + sp * 22
     for (let i = 0; i < n; i++) {
@@ -242,6 +249,15 @@ export function initSpray() {
     if (!first && still > 14 && still < 50 && still % 12 === 0) {
       ps.push({ x: lx + gauss() * 10, y: ly + 4, y0: ly + 4, vy: 0.5 + Math.random() * 0.8, r: 1 + Math.random() * 1.4, life: 0, max: 100 + Math.random() * 50, drip: true, col })
     }
+    // sin partículas no se toca el canvas (cero costo en reposo)
+    if (!ps.length) {
+      if (dirty) {
+        o.clearRect(0, 0, c.width, c.height)
+        dirty = false
+      }
+      return
+    }
+    dirty = true
     o.clearRect(0, 0, c.width, c.height)
     for (let i = ps.length - 1; i >= 0; i--) {
       const p = ps[i]
@@ -283,6 +299,11 @@ export function initMeltables() {
     el.addEventListener('pointerenter', () => (it.target = 70))
     el.addEventListener('pointerleave', () => (it.target = 0))
     return it
+  })
+  // easter egg: derrite todos los titulares a la vez
+  addEventListener('nyx-melt', () => {
+    items.forEach((it) => (it.target = 150))
+    setTimeout(() => items.forEach((it) => (it.target = 0)), 2600)
   })
   return (velocity: number) => {
     items.forEach((it) => {
