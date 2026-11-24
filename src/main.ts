@@ -139,8 +139,7 @@ function initMelt() {
     cur += (target - cur) * 0.12
     target *= 0.9
     scrollFx.v *= 0.9
-    // el filtro del derretido se re-pinta en CPU: máximo 24 veces por segundo
-    // (sigue viéndose líquido); en modo liviano el de scroll se apaga
+    // Copias de columnas del texto cacheado a 24 Hz; sin re-filtrar SVG.
     if (t - meltT > 1 / 24) {
       meltT = t
       updateMelt(lite ? 0 : cur)
@@ -246,6 +245,7 @@ async function initPhotoReel() {
     wrap.classList.add('photos--fallback')
     initPhotos(reduce)
   }
+  wrap.dataset.photosReady = '1'
 }
 
 document.fonts.ready.then(async () => {
@@ -284,10 +284,13 @@ function animate() {
       if (line.classList.contains('h-graf--ink')) {
         tl.fromTo(line, { scaleX: 0, transformOrigin: '0% 50%', rotate: -8 }, { scaleX: 1, rotate: -2, duration: 0.5, ease: 'back.out(2.2)' }, i * 0.28)
       } else {
+        const glow = line.querySelector('.melt__glow')
         tl.fromTo(line,
-          { clipPath: 'inset(-40% 100% -60% -5%)', textShadow: '0 0 30px rgba(200,243,29,.95)' },
-          { clipPath: 'inset(-40% -5% -60% -5%)', textShadow: '0 0 0px rgba(200,243,29,0)', duration: 1.1, ease: 'power2.inOut' },
+          { clipPath: 'inset(-40% 100% -60% -5%)', ...(glow ? {} : { textShadow: '0 0 30px rgba(200,243,29,.95)' }) },
+          { clipPath: 'inset(-40% -5% -60% -5%)', ...(glow ? {} : { textShadow: '0 0 0px rgba(200,243,29,0)' }), duration: 1.1, ease: 'power2.inOut' },
           i * 0.28)
+        // La niebla también está cacheada: la entrada sólo cambia opacidad.
+        if (glow) tl.fromTo(glow, { opacity: 1 }, { opacity: 0, duration: 1.1, ease: 'power2.inOut' }, i * 0.28)
       }
     })
   })

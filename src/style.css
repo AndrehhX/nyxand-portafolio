@@ -534,12 +534,18 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
 .frame__shot:hover::after,
 .frame__shot:focus-visible::after { opacity: 1; }
 .frame__shot:hover canvas { animation: glitch 0.42s steps(1) infinite; }
+/* La ruta de recorte/composición existe antes del primer hover. Alternar
+   none/inset y 2D/3D al empezar el glitch causaba un pico inicial en GPU. */
+.frame__shot img, .frame__shot canvas {
+  clip-path: inset(0);
+  transform: translate3d(0, 0, 0);
+}
 @keyframes glitch {
-  0% { transform: none; clip-path: none; }
-  20% { transform: translate(-6px, 2px); clip-path: inset(12% 0 58% 0); }
-  40% { transform: translate(5px, -1px); clip-path: inset(48% 0 20% 0); }
-  60% { transform: translate(-2px, 0); clip-path: inset(0 0 80% 0); }
-  80% { transform: translate(3px, 1px); clip-path: inset(70% 0 4% 0); }
+  0%, 100% { transform: translate3d(0, 0, 0); clip-path: inset(0); }
+  20% { transform: translate3d(-6px, 2px, 0); clip-path: inset(12% 0 58% 0); }
+  40% { transform: translate3d(5px, -1px, 0); clip-path: inset(48% 0 20% 0); }
+  60% { transform: translate3d(-2px, 0, 0); clip-path: inset(0 0 80% 0); }
+  80% { transform: translate3d(3px, 1px, 0); clip-path: inset(70% 0 4% 0); }
 }
 .frame__num {
   position: absolute;
@@ -1052,7 +1058,16 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
 /* will-change: cada título en su propia capa → la inclinación la hace la GPU
    sin volver a pintar el texto ni su filtro */
 .yo__title, .stack__title, .trabajo__head h2, .photos__head h3 { transform-origin: 0 50%; will-change: transform; }
-.melt { cursor: crosshair; }
+.melt {
+  cursor: crosshair;
+  /* El filtro cambia su contenido: aislar su textura de la capa del título
+     completo. No usar contain:paint, porque cortaría los chorreados. */
+  will-change: transform;
+}
+.melt--cached { position: relative; filter: none; }
+.melt--cached > .melt__text { opacity: 0; }
+.melt__canvas { position: absolute; pointer-events: none; }
+.melt__glow { opacity: 0; }
 
 /* párrafos palabra por palabra */
 .w { display: inline-block; overflow: hidden; vertical-align: top; padding-bottom: 0.08em; margin-bottom: -0.08em; }

@@ -1,4 +1,5 @@
 import gsap from 'gsap'
+import { cacheMelt } from './melt'
 
 function rng(seed: number) {
   let s = seed * 9301 + 49297
@@ -137,9 +138,13 @@ export function initCursor() {
   document.documentElement.classList.add('has-cursor')
   const c = document.querySelector<HTMLElement>('.cursor')!
   const label = c.querySelector<HTMLElement>('.cursor__label')!
-  gsap.set(c, { xPercent: -50, yPercent: -50 })
-  const xTo = gsap.quickTo(c, 'x', { duration: 0.22, ease: 'power3' })
-  const yTo = gsap.quickTo(c, 'y', { duration: 0.22, ease: 'power3' })
+  // Mismo tipo de transformación desde el primer pintado. En (0,0) el punto
+  // quedaba recortado: su primera aparición completa/subpíxel abría una ruta
+  // de composición nueva (~42 ms en Edge). Pintarlo dentro del viewport
+  // prepara esa ruta sin esperar al primer movimiento del visitante.
+  gsap.set(c, { x: 16.5, y: 16.5, xPercent: -50, yPercent: -50, force3D: true })
+  const xTo = gsap.quickTo(c, 'x', { duration: 0.22, ease: 'power3', force3D: true })
+  const yTo = gsap.quickTo(c, 'y', { duration: 0.22, ease: 'power3', force3D: true })
   addEventListener('pointermove', (e) => {
     xTo(e.clientX)
     yTo(e.clientY)
@@ -321,9 +326,9 @@ export function initSpray() {
   })
 }
 
-// Cada titular .melt tiene su propio filtro: se derrite con la velocidad
-// del scroll (global) y además al pasarle el cursor encima.
-// Ruido de columnas precalculado UNA vez en un canvas. Antes cada filtro
+// Los titulares reaccionan al scroll y al cursor con texto cacheado en
+// canvas. Se conserva SVG como fallback y para la placa estática HABLEMOS.
+// Ruido del fallback precalculado UNA vez. Antes cada filtro
 // usaba feTurbulence, que el navegador recalcula (en CPU) cada vez que cambia
 // la escala del derretido: eso era lo que trababa el scroll.
 let meltNoise = ''
@@ -366,7 +371,25 @@ export function initMeltables() {
   const defs = document.querySelector('svg.defs')!
   const NS = 'http://www.w3.org/2000/svg'
   const noise = columnNoise()
+  // Un filtro fuera de pantalla también invalida su display list al cambiar.
+  // Preparar sólo un margen pequeño antes de entrar, no todos los titulares.
+  const visible = new Set<Element>()
+  const observer = new IntersectionObserver((entries) => {
+    for (const en of entries) {
+      if (en.isIntersecting) visible.add(en.target)
+      else visible.delete(en.target)
+    }
+  }, { rootMargin: '80px 0px' })
+  const item = (el: HTMLElement, apply: (s: number) => void, scroll: boolean) => {
+    const it = { el, apply, hover: 0, target: 0, shown: -1, scroll }
+    if (scroll) {
+      el.addEventListener('pointerenter', () => (it.target = 70))
+      el.addEventListener('pointerleave', () => (it.target = 0))
+    }
+    return it
+  }
   const items = [...document.querySelectorAll<HTMLElement>('.melt')].map((el, i) => {
+    observer.observe(el)
     // Títulos gigantes ("HABLEMOS"): ruido continuo (feTurbulence; el feImage
     // se desalinea entre los mosaicos de pintado y lo corta en franjas) y
     // goteo FIJO. Ya no reacciona al cursor: re-rasterizar este filtro sobre
@@ -379,8 +402,11 @@ export function initMeltables() {
       el.style.filter = `url(#melt-${i})`
       const map = f.querySelector('feDisplacementMap')!
       map.removeAttribute('id')
-      return { el, map, hover: 0, target: 0, shown: -1, scroll: false }
+      return item(el, (s) => map.setAttribute('scale', String(s)), false)
     }
+    const cached = cacheMelt(el, i + 1)
+    if (cached) return item(el, cached, true)
+    // Fallback si el navegador no puede crear un canvas 2D.
     const f = document.createElementNS(NS, 'filter')
     f.id = `melt-${i}`
     f.setAttribute('x', '-2%')
@@ -410,11 +436,7 @@ export function initMeltables() {
     el.style.filter = `url(#melt-${i})`
     const map = f.querySelector('feDisplacementMap')!
     // data-melt-scroll="off": sólo se derrite con el cursor (títulos muy pesados)
-    const scroll = el.dataset.meltScroll !== 'off'
-    const it = { el, map, hover: 0, target: 0, shown: -1, scroll }
-    el.addEventListener('pointerenter', () => (it.target = 70))
-    el.addEventListener('pointerleave', () => (it.target = 0))
-    return it
+    return item(el, (s) => map.setAttribute('scale', String(s)), true)
   })
   // easter egg: derrite todos los titulares a la vez
   addEventListener('nyx-melt', () => {
@@ -423,12 +445,13 @@ export function initMeltables() {
   })
   return (velocity: number) => {
     items.forEach((it) => {
+      if (!visible.has(it.el)) return
       it.hover += (it.target - it.hover) * (it.target ? 0.05 : 0.08)
       // en pasos de 3px: menos re-filtrados, el ojo no nota la diferencia
       const s = Math.round((10 + (it.scroll ? velocity : 0) + it.hover) / 3) * 3
       if (s !== it.shown) {
         it.shown = s
-        it.map.setAttribute('scale', String(s))
+        it.apply(s)
       }
     })
   }
