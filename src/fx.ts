@@ -25,8 +25,10 @@ function jag(r: () => number, base: number, amp: number, minStep = 6, maxStep = 
   }
   return pts
 }
-const fillDown = (pts: [number, number][]) =>
-  `M-30 -40 L${pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L')} L${TW + 30} -40 Z`
+// top: las capas de atrás arrancan dentro del corte para que su borde
+// superior (rugoso por el filtro) nunca asome sobre la sección anterior
+const fillDown = (pts: [number, number][], top = -40) =>
+  `M-30 ${top} L${pts.map(([x, y]) => `${x.toFixed(1)} ${y.toFixed(1)}`).join(' L')} L${TW + 30} ${top} Z`
 
 export function buildTears() {
   document.querySelectorAll<HTMLElement>('.tear').forEach((el, idx) => {
@@ -41,27 +43,17 @@ export function buildTears() {
     const lime = jag(r, TH * 0.5, 40, 10, 40)
     const back = jag(r, TH * 0.7, 30, 8, 30)
 
-    // chorreados del color de arriba
-    let drips = ''
-    for (let i = 0; i < 16; i++) {
-      const p = front[Math.floor(r() * front.length)]
-      const w = 4 + r() * 12
-      const len = 30 + r() * 150
-      const x = p[0]
-      const y0 = 4
-      const y1 = p[1] + len
-      drips += `M${x - w / 2} ${y0} L${x - w / 2} ${y1 - w} Q${x - w / 2} ${y1 + w * 0.4} ${x} ${y1 + w * 0.5} Q${x + w / 2} ${y1 + w * 0.4} ${x + w / 2} ${y1 - w} L${x + w / 2} ${y0} Z `
-    }
+    // el borde se guarda para que drips.ts cuelgue las gotas de él
+    ;(el as HTMLElement & { _edge?: [number, number][] })._edge = front.map(([x, y]) => [x / TW, y / TH])
 
     const svg = (cls: string, d: string, fill: string, filter = 'url(#rough)') =>
       `<svg class="tear__l tear__l--${cls}" viewBox="0 0 ${TW} ${TH}" preserveAspectRatio="none" aria-hidden="true"><path d="${d}" fill="${fill}" filter="${filter}"/></svg>`
 
     el.innerHTML =
-      svg('back', fillDown(back), deep) +
-      svg('lime', fillDown(lime), 'var(--lime)') +
-      svg('fiber', fillDown(fiber), '#f4f2ec') +
-      svg('front', fillDown(front), `var(--${from})`) +
-      svg('drips', drips, `var(--${from})`, 'none')
+      svg('back', fillDown(back, 30), deep) +
+      svg('lime', fillDown(lime, 30), 'var(--lime)') +
+      svg('fiber', fillDown(fiber, 20), '#f4f2ec') +
+      svg('front', fillDown(front), `var(--${from})`)
   })
 }
 

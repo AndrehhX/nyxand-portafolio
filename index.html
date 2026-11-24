@@ -24,6 +24,11 @@
         <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 -0.6 0 0 0.5  0 0 0 0 0.5  0 0 0 0 1" result="m" />
         <feDisplacementMap id="melt-map" in="SourceGraphic" in2="m" scale="14" xChannelSelector="R" yChannelSelector="G" />
       </filter>
+      <!-- Línea "hirviendo" de animación a mano: el seed cambia a 12 fps -->
+      <filter id="boil" x="-5%" y="-5%" width="110%" height="110%">
+        <feTurbulence id="boil-noise" type="fractalNoise" baseFrequency="0.035" numOctaves="2" seed="1" />
+        <feDisplacementMap in="SourceGraphic" scale="3.2" xChannelSelector="R" yChannelSelector="G" />
+      </filter>
       <filter id="melt-static" x="-2%" y="-10%" width="104%" height="170%" color-interpolation-filters="sRGB">
         <feTurbulence type="fractalNoise" baseFrequency="0.045 0.003" numOctaves="2" seed="11" result="n" />
         <feColorMatrix in="n" type="matrix" values="0 0 0 0 0.5  0 -0.7 0 0 0.5  0 0 0 0 0.5  0 0 0 0 1" result="m" />
@@ -87,15 +92,28 @@
 
         <div class="yo__grid">
           <figure class="doodle" aria-hidden="true">
-            <svg viewBox="0 0 260 220">
-              <circle data-draw cx="80" cy="56" r="26" />
-              <path data-draw d="M70 52 L70 54 M90 52 L90 54" />
-              <path data-draw d="M68 66 C 74 74, 86 74, 92 66" />
-              <path data-draw d="M80 82 L80 148" />
-              <path data-draw d="M80 100 L118 122 M80 100 L122 112" />
-              <path data-draw d="M80 148 L60 196 M80 148 L104 194" />
-              <path data-draw d="M112 128 L178 128 L190 96 L126 96 Z" />
-              <path class="doodle__arrow" data-draw d="M236 20 C 220 50, 200 60, 170 66 M182 56 L170 66 L184 74" />
+            <svg viewBox="0 0 260 230" class="doodle__svg">
+              <g class="doodle__ink">
+                <g class="d-head">
+                  <path data-pen d="M80 30 C 64 29, 53 42, 54 57 C 55 72, 67 83, 81 82 C 96 81, 107 69, 106 55 C 105 41, 94 30, 78 31" />
+                  <path data-pen class="d-eye" d="M70 50 L70 55" />
+                  <path data-pen class="d-eye" d="M90 50 L90 55" />
+                  <path data-pen class="d-mouth" d="M68 65 C 73 73, 86 74, 93 64" />
+                </g>
+                <path data-pen d="M80 82 C 81 104, 79 126, 80 150" />
+                <g class="d-arm d-arm--a"><path data-pen d="M80 100 C 94 108, 106 116, 118 122" /></g>
+                <g class="d-arm d-arm--b"><path data-pen d="M80 100 C 96 104, 110 108, 122 112" /></g>
+                <path data-pen d="M80 150 C 74 166, 66 180, 59 197" />
+                <path data-pen d="M80 150 C 88 166, 97 180, 105 195" />
+                <g class="d-laptop">
+                  <path data-pen d="M112 128 L 178 128 L 191 96 L 125 96 Z" />
+                  <path data-pen class="d-code" d="M131 104 L 160 104" />
+                  <path data-pen class="d-code" d="M135 112 L 150 112 M 154 112 L 172 112" />
+                  <path data-pen class="d-code" d="M129 120 L 165 120" />
+                </g>
+                <g class="d-sweat"><path data-pen d="M112 40 C 108 48, 112 54, 116 50 C 118 46, 114 42, 112 40 Z" /></g>
+                <path data-pen class="doodle__arrow" d="M236 18 C 222 48, 202 60, 172 66 M184 55 L 172 66 L 185 75" />
+              </g>
             </svg>
             <figcaption>yo, debuggeando<br />a las 3am</figcaption>
           </figure>

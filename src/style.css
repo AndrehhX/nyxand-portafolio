@@ -1072,6 +1072,24 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
   75% { transform: rotate(-2deg) scale(1.03); }
 }
 
+/* gotas realistas: pueden colgar sobre la sección de abajo */
+.tear { overflow: visible; z-index: 4; }
+.tear__l { will-change: transform; }
+.tear__drips { position: absolute; left: 0; top: 0; width: 100%; height: 100%; overflow: visible; pointer-events: none; }
+.tear__shine { fill: none; stroke: rgba(255, 255, 255, 0.32); stroke-width: 1.2; stroke-linecap: round; }
+
+/* monito a mano */
+.doodle__svg { overflow: visible; }
+.doodle__svg path { fill: none; stroke: var(--ink); stroke-width: 3.6; stroke-linecap: round; stroke-linejoin: round; }
+.doodle__svg .d-code { stroke-width: 2.2; }
+.doodle__svg .d-sweat path { stroke-width: 2.4; }
+.doodle__svg .doodle__arrow { stroke-width: 2.6; }
+
+/* pulido: todo lo interactivo responde suave */
+a, button { transition: color 0.25s ease, background-color 0.25s ease, opacity 0.25s ease; }
+.hud__nav a, .hablemos__links a, .foot a { display: inline-block; transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), color 0.25s; }
+.hud__nav a:hover, .hablemos__links a:hover { transform: translateY(-2px); text-decoration: none; }
+
 /* frames: el número parpadea al estar al frente */
 .frame.is-front .frame__num { animation: blink 0.9s steps(1) 3; color: var(--lime); }
 

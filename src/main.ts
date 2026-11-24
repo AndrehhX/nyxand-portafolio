@@ -8,15 +8,21 @@ import Lenis from 'lenis'
 import { buildFilm, initCase } from './film'
 import { mountSigils } from './sigil'
 import { initPhotos } from './interact'
+import { initDrips } from './drips'
+import { initDoodle } from './doodle'
 import {
   buildTapes, buildTears, fitText, initClock, initCursor, initGrain, initMeltables, initSpray,
   scramble, scrambleIn, splitWords,
 } from './fx'
 
 gsap.registerPlugin(ScrollTrigger)
+gsap.defaults({ ease: 'expo.out' })
+ScrollTrigger.config({ ignoreMobileResize: true })
 const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches
 
-const lenis = reduce ? null : new Lenis({ lerp: 0.085 })
+const lenis = reduce ? null : new Lenis({ lerp: 0.08, wheelMultiplier: 0.9, touchMultiplier: 1.2 })
+// las imágenes y fuentes cambian alturas: recalcular triggers al terminar de cargar
+addEventListener('load', () => ScrollTrigger.refresh())
 if (lenis) {
   lenis.on('scroll', ScrollTrigger.update)
   gsap.ticker.add((t) => lenis.raf(t * 1000))
@@ -44,6 +50,8 @@ if (!reduce) {
   initMelt()
   initSpray()
 }
+initDrips(() => scrollFx.v, reduce)
+initDoodle(reduce)
 runIntro()
 
 // ---------------------------------------------------------------
@@ -183,7 +191,6 @@ function animate() {
     const st = { trigger: el, start: 'top bottom', end: 'bottom top', scrub: 0.6 }
     gsap.fromTo(el.querySelectorAll('.tear__l--front, .tear__l--fiber'), { scaleY: 1.15 }, { scaleY: 0.55, ease: 'none', scrollTrigger: st })
     gsap.fromTo(el.querySelector('.tear__l--lime'), { scaleY: 1.2 }, { scaleY: 0.8, ease: 'none', scrollTrigger: st })
-    gsap.fromTo(el.querySelector('.tear__l--drips'), { scaleY: 0.35 }, { scaleY: 1.25, ease: 'none', scrollTrigger: st })
   })
 
   // Titulares: cada línea se pinta con aerosol (barrido + niebla lima que
@@ -274,9 +281,6 @@ function animate() {
     if (mx > 0) mx -= w
     mq.style.transform = `translate3d(${mx}px,0,0)`
   })
-
-  // Doodle: el monito respira y saluda
-  gsap.to('.doodle svg', { rotate: 3, transformOrigin: '30% 100%', duration: 1.6, ease: 'sine.inOut', yoyo: true, repeat: -1 })
 
   gsap.utils.toArray<SVGElement>('.sigil').forEach((s) => {
     gsap.fromTo(s, { rotateY: -70, rotateZ: -12, scale: 0.6, opacity: 0 }, {

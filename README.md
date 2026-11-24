@@ -9,7 +9,8 @@ La dirección visual mezcla lo hecho a mano (tinta, brocha, papel rasgado, garab
 - **Intro**: contador en pixel-gótico mientras carga el 3D; luego las letras caen con impacto (temblor de cámara y flash) y el nombre se pinta como tag de aerosol que chorrea.
 - **Tipografía urbana**: una sola display, graffiti (Sedgwick Ave Display), también en el NyxAnd 3D; mono para el resto y lima sólo como acento. Los titulares se derriten con un filtro SVG cuya intensidad depende de la velocidad del scroll.
 - **Todo animado**: cursor de aerosol que pinta (lima sobre negro, tinta sobre papel) y chorrea si te quedas quieto; titulares que se pintan con niebla de spray, se derriten al pasarles el cursor y se inclinan con la velocidad del scroll; párrafos palabra por palabra; etiquetas y links que se decodifican; números que cuentan; correo con letras que saltan; marquesina que sigue la dirección del scroll; status con glitch.
-- **Cortes multicapa**: entre secciones la página se rompe y deja ver capas de sticker roto lima y negro/blanco, con chorreados que se estiran con el scroll.
+- **Cortes multicapa**: entre secciones la página se rompe y deja ver capas de sticker roto lima y negro/blanco. De la hoja cuelgan gotas realistas (cuello, bulbo, brillo húmedo) que crecen por su peso, sueltan gotas que caen acelerando y gotean más con scroll rápido.
+- **Monito a mano**: se dibuja trazo por trazo como con plumón, con línea que "hierve" a 12 fps; después cabecea de sueño, teclea, parpadea, le cae una gota de sudor y el código parpadea en la laptop.
 - **Foto real tramada** a 1-bit como fondo del hero, y carrusel WebGL infinito "Fuera del código" que se arquea y se derrite según la velocidad del arrastre.
 - **Capturas reales** de Orunei y Kaze en el carrete (se revelan a color al pasar el cursor).
 - **Sigilos procedurales** (estilo cyber-sigilism) generados con curvas bezier y espinas.
@@ -55,6 +56,8 @@ El build es estático: se puede desplegar en Vercel, Netlify o cualquier hosting
     ├── hero3d.ts       # Hero WebGL: texto 3D de cromo + shader de dithering
     ├── sigil.ts        # Generador procedural de sigilos
     ├── photos3d.ts     # Carrusel WebGL de fotos que se derrite
+    ├── drips.ts        # Gotas animadas en los cortes
+    ├── doodle.ts       # Animación del monito dibujado a mano
     ├── interact.ts     # Carrusel DOM de respaldo (sin WebGL)
     ├── film.ts         # Carrete de proyectos, pósters 1-bit y panel de caso
     ├── projects.ts     # Datos de los proyectos
