@@ -1030,6 +1030,8 @@ html:not(.no-gl) .hero__fallback { display: grid; opacity: 0; pointer-events: no
 
 /* hero: la firma acompaña, no compite con el 3D */
 .tag { rotate: -4deg; bottom: clamp(70px, 11vh, 110px); }
+/* .tag ahora es el <h1> real de la página (SEO): sin estilos por defecto del h1 */
+h1.tag { margin: 0; font-size: inherit; font-weight: 400; line-height: normal; }
 .tag__name { font-size: clamp(40px, 5vw, 86px); text-shadow: 0.04em 0.04em 0 #000; }
 .tag__meta { margin-top: 0.7em; }
 

@@ -16,9 +16,11 @@
     <meta charset="UTF-8" />
     <meta name="copyright" content="© 2026 Dereck Andreh Callejas Ajin (NyxAnd). Todos los derechos reservados." />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>NyxAnd — Andreh Callejas, desarrollador de software</title>
-    <meta name="description" content="Portafolio de Andreh Callejas (NyxAnd), desarrollador de software en Guatemala: plataformas web, apps Android y herramientas de escritorio con React, Next.js, Supabase, Kotlin y Rust." />
+    <title>Andreh Callejas (NyxAnd) | Desarrollador de software en Guatemala</title>
+    <meta name="description" content="Portafolio de Dereck Andreh Callejas Ajin (NyxAnd), desarrollador de software en Guatemala. Plataformas web, apps Android y herramientas de escritorio con React, Next.js, TypeScript, Supabase, Kotlin, Rust y WebGL." />
     <meta name="author" content="Dereck Andreh Callejas Ajin" />
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1" />
+    <meta name="keywords" content="Andreh Callejas, Dereck Andreh Callejas Ajin, NyxAnd, desarrollador de software Guatemala, desarrollador web Guatemala, frontend, React, Next.js, TypeScript, WebGL, portafolio" />
     <meta name="theme-color" content="#060606" />
     <meta name="color-scheme" content="dark light" />
     <link rel="canonical" href="https://nyxand.site/" />
@@ -28,7 +30,10 @@
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="es_GT" />
     <meta property="og:site_name" content="NyxAnd" />
-    <meta property="og:title" content="NyxAnd — Andreh Callejas" />
+    <meta property="og:title" content="Andreh Callejas (NyxAnd) — Desarrollador de software" />
+    <meta property="og:image:alt" content="NyxAnd — Andreh Callejas, desarrollador de software en Guatemala" />
+    <meta name="twitter:title" content="Andreh Callejas (NyxAnd) — Desarrollador de software" />
+    <meta name="twitter:description" content="Código, interfaces y automatización desde Guatemala." />
     <meta property="og:description" content="Código, interfaces y automatización desde Guatemala. Portafolio 1-bit, graffiti y pintura que chorrea." />
     <meta property="og:url" content="https://nyxand.site/" />
     <meta property="og:image" content="https://nyxand.site/og.jpg" />
@@ -36,16 +41,59 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://nyxand.site/og.jpg" />
+    <!-- Datos estructurados: quién soy, el sitio y mis proyectos (los proyectos
+         se pintan con JS; aquí Google los lee sin ejecutar nada) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Person",
-        "name": "Dereck Andreh Callejas Ajin",
-        "alternateName": "NyxAnd",
-        "jobTitle": "Desarrollador de software",
-        "address": { "@type": "PostalAddress", "addressCountry": "GT" },
-        "url": "https://nyxand.site/",
-        "sameAs": ["https://github.com/AndrehhX", "https://www.instagram.com/nyx_and_/"]
+        "@graph": [
+          {
+            "@type": "Person",
+            "@id": "https://nyxand.site/#persona",
+            "name": "Dereck Andreh Callejas Ajin",
+            "givenName": "Dereck Andreh",
+            "familyName": "Callejas Ajin",
+            "alternateName": ["Andreh Callejas", "NyxAnd"],
+            "jobTitle": "Desarrollador de software",
+            "description": "Desarrollador de software y estudiante de Ingeniería en Ciencias de la Computación en Guatemala. Construye plataformas web, apps Android y herramientas de escritorio.",
+            "image": "https://nyxand.site/og.jpg",
+            "email": "mailto:andrehcallex@gmail.com",
+            "url": "https://nyxand.site/",
+            "address": { "@type": "PostalAddress", "addressLocality": "Guatemala", "addressCountry": "GT" },
+            "knowsAbout": ["Desarrollo web", "Frontend", "React", "Next.js", "TypeScript", "WebGL", "three.js", "GSAP", "Supabase", "Node.js", "Kotlin", "Jetpack Compose", "Rust", "Tauri", "Java", "MySQL", "Python"],
+            "sameAs": ["https://github.com/AndrehhX", "https://www.instagram.com/nyx_and_/"]
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://nyxand.site/#sitio",
+            "url": "https://nyxand.site/",
+            "name": "NyxAnd",
+            "alternateName": "Andreh Callejas — Portafolio",
+            "inLanguage": "es",
+            "publisher": { "@id": "https://nyxand.site/#persona" }
+          },
+          {
+            "@type": "ProfilePage",
+            "@id": "https://nyxand.site/#perfil",
+            "url": "https://nyxand.site/",
+            "name": "Andreh Callejas (NyxAnd) | Desarrollador de software en Guatemala",
+            "inLanguage": "es",
+            "isPartOf": { "@id": "https://nyxand.site/#sitio" },
+            "mainEntity": { "@id": "https://nyxand.site/#persona" },
+            "dateModified": "2026-11-24"
+          },
+          {
+            "@type": "ItemList",
+            "name": "Proyectos de Andreh Callejas",
+            "itemListElement": [
+              { "@type": "ListItem", "position": 1, "item": { "@type": "WebApplication", "name": "Kaze", "url": "https://www.orunei.sbs", "applicationCategory": "EntertainmentApplication", "operatingSystem": "Web, Android", "description": "Plataforma de anime y manga: web en Next.js y app Android en Kotlin con una sola cuenta, streaming HLS y watch parties en tiempo real.", "author": { "@id": "https://nyxand.site/#persona" } } },
+              { "@type": "ListItem", "position": 2, "item": { "@type": "SoftwareSourceCode", "name": "Orunei", "codeRepository": "https://github.com/AndrehhX/orunei", "programmingLanguage": "JavaScript", "description": "Red social de anime con recomendaciones, AnimeList, perfiles y reescalado Anime4K con WebGL2.", "author": { "@id": "https://nyxand.site/#persona" } } },
+              { "@type": "ListItem", "position": 3, "item": { "@type": "SoftwareSourceCode", "name": "Mono Motion", "codeRepository": "https://github.com/AndrehhX/mono-motion", "programmingLanguage": "TypeScript", "description": "Experimento editorial de motion, tipografía y transiciones con React, TypeScript y GSAP.", "author": { "@id": "https://nyxand.site/#persona" } } },
+              { "@type": "ListItem", "position": 4, "item": { "@type": "SoftwareSourceCode", "name": "Student Organizer", "codeRepository": "https://github.com/AndrehhX/Student-Organizer-Web", "programmingLanguage": "Java", "description": "Proyecto universitario en equipo para organizar cursos, tareas, calificaciones y promedios con Java y MySQL.", "author": { "@id": "https://nyxand.site/#persona" } } },
+              { "@type": "ListItem", "position": 5, "item": { "@type": "SoftwareApplication", "name": "Launcher", "applicationCategory": "GameApplication", "operatingSystem": "Windows", "description": "Biblioteca de escritorio nativa para Steam, Epic Games y GOG con Rust y Tauri (en desarrollo).", "author": { "@id": "https://nyxand.site/#persona" } } }
+            ]
+          }
+        ]
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -109,17 +157,18 @@
       <!-- ============ HERO ============ -->
       <section class="hero" id="hero">
         <canvas class="hero__gl" id="hero-gl" data-cursor="mantén = derretir" aria-hidden="true"></canvas>
-        <h1 class="hero__fallback">NyxAnd <small>Andreh Callejas — desarrollador</small></h1>
+        <div class="hero__fallback" aria-hidden="true">NyxAnd <small>Andreh Callejas — desarrollador</small></div>
 
         <div class="corner corner--tl">[ ANDREH CALLEJAS ]<br />CÓDIGO · INTERFACES · AUTOMATIZACIÓN</div>
         <div class="corner corner--tr">GUATEMALA<br />14.63°N 90.51°W</div>
         <div class="corner corner--br"><span class="blink">■</span> MANTÉN PRESIONADO<br />PARA DERRETIR</div>
         <div class="hero__status">● DISPONIBLE PARA PROYECTOS</div>
 
-        <div class="tag" aria-hidden="true">
+        <!-- H1 visible y real: el nombre que Google asocia a la página -->
+        <h1 class="tag">
           <span class="tag__name">Andreh Callejas</span>
           <span class="tag__meta">[ desarrollador de software — guatemala ]</span>
-        </div>
+        </h1>
       </section>
 
       <div class="tear" data-from="ink" data-to="paper"></div>
