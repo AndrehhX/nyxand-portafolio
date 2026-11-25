@@ -95,12 +95,14 @@ export function buildFilm() {
     )
     .join('')
 
+  // el último cuadro siempre es el siguiente número libre
+  const next = String(projects.length + 1).padStart(2, '0')
   track.innerHTML =
     frames +
     `<article class="frame frame--end">
-      <div class="frame__edge"><span>NYX 100 PROFESSIONAL</span><span>▸ 06A</span></div>
+      <div class="frame__edge"><span>NYX 100 PROFESSIONAL</span><span>▸ ${next}A</span></div>
       <a class="frame__shot frame__shot--end" href="#hablemos" data-cursor="hablemos">
-        <span>¿fotograma 06?</span>
+        <span>¿fotograma ${next}?</span>
         <em>puede ser el tuyo →</em>
       </a>
       <div class="frame__meta"><h3>TU PROYECTO</h3><p>Todavía sin revelar.</p></div>

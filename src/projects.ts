@@ -63,6 +63,28 @@ export const projects: Project[] = [
   },
   {
     id: '03',
+    name: 'WILBER BARRERA',
+    kind: 'Portafolio para cliente',
+    desc: 'Marketing digital y beats: vinilo animado y caja de ritmos que suena en el navegador.',
+    long: 'Portafolio oficial de Wilber Barrera, especialista en marketing digital y productor de beats. Lo diseñé y desarrollé completo: una experiencia de una sola página que se "construye" mientras haces scroll, con la metáfora del disco de vinilo (Side A: marketing, Side B: beats) y una identidad editorial en rojo y negro con estética retro.',
+    highlights: [
+      'Beat Lab: caja de ritmos interactiva de 16 pasos (kick, snare, hi-hat, 808 y teclados) sintetizada en tiempo real con Web Audio API, con visualizador, control de tempo y patrones aleatorios.',
+      'Portada con vinilo giratorio y brazo de tocadiscos; el scroll "inunda" la pantalla de rojo.',
+      'Pantalla de carga con contador, registro tipo terminal y apagado CRT; el sitio se construye bloque por bloque al hacer scroll.',
+      'Galería de proyectos horizontal sincronizada con el scroll (vertical en móvil) y servicios en dos caras, Side A / Side B.',
+    ],
+    stack: ['Vite', 'JavaScript', 'GSAP + ScrollTrigger', 'Lenis', 'Web Audio API'],
+    status: 'En línea',
+    glyph: 'W',
+    img: '/media/wilbinho.jpg',
+    links: [
+      { label: 'Abrir sitio', href: 'https://wilbinho-portfolio.vercel.app' },
+      { label: 'Ver código', href: 'https://github.com/wilbinho123/WILBINHO-PORTFOLIO' },
+    ],
+    seed: 6,
+  },
+  {
+    id: '04',
     name: 'MONO MOTION',
     kind: 'Experimento editorial',
     desc: 'Portafolio experimental de motion, tipografía y transiciones.',
@@ -80,7 +102,7 @@ export const projects: Project[] = [
     seed: 4,
   },
   {
-    id: '04',
+    id: '05',
     name: 'STUDENT ORG',
     kind: 'Proyecto académico en grupo',
     desc: 'Cursos, tareas, calificaciones y promedios.',
@@ -98,7 +120,7 @@ export const projects: Project[] = [
     seed: 5,
   },
   {
-    id: '05',
+    id: '06',
     name: 'LAUNCHER',
     kind: 'App de escritorio',
     desc: 'Una sola biblioteca nativa para Steam, Epic Games y GOG.',
